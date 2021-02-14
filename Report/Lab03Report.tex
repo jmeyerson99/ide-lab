@@ -19,6 +19,7 @@
 \usepackage{float}
 \usepackage{titlesec}
 \usepackage{pdfpages}
+\usepackage{siunitx}
 
 \begin{document}
 \maketitle
@@ -30,29 +31,89 @@
 %Abstract Section
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
+% Add a brief description of lab
 		
 %Design Methodology Section
 \section*{Design Methodology}
 \addcontentsline{toc}{section}{Design Methodology}
+% Describe the calculations for Rf in both circuits
+
+% Describe the making of the apparatus
 
 %Results Section	
 \section*{Results \& Analysis}
 \addcontentsline{toc}{section}{Results \& Analysis}
+% Part 1 ------------------------------------------------------------------
+% Describe the process used to obtain voltage measurements
 
+% Table of recorded values
+\begin{table}
+	\centering
+	\caption{Table of Measured Voltages and Calculated Currents for the OPB745}
+	\label{part_1_table}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Distance (\si{\milli\meter}) & $V_{out}$ for 10\si{\kilo\ohm} (\si{\volt}) & $I_{RL}$ for 10\si{\kilo\ohm} (\si{\ampere}) & $V_{out}$ for 20\si{\kilo\ohm} (\si{\volt}) & $I_{RL}$ for 20\si{\kilo\ohm} (\si{\ampere}) \\ \hline
+		X & X & X & X & X  \\
+		\hline 
+	\end{tabular}
+\end{table}
+
+Figure \ref{10k_voltage_graph} shows the voltage outputs for the optoisolator based on the distance of the reflective surface from the optoisolator.
+% 10k Ohm Voltage Graph
 \begin{figure}[H]
 	\centering
-  	%\includegraphics[width=1.0\textwidth]{Screenshots/UART_lab_part_2}  
-	\caption{UART Driver Demo Part 2}
-	\label{Figure 1}
+  	%\includegraphics[width=0.75\textwidth]{Screenshots/}  
+	\caption{Voltage vs Distance Graph for Load Resistor of $10\si{\kilo\ohm}$}
+	\label{10k_voltage_graph}
 \end{figure}
+
+After measuring the voltage outputs, the current through the optoisolator is calculated using Ohm's Law ($V = IR$). The current at each distance is calculated by dividing the voltage at each distance by the $10\si{\kilo\ohm}$ load resistor. The current at each distance measurement was calculated and graphed, shown in Figure \ref{10k_current_graph}.
+% 10k Ohm Current Graph
+\begin{figure}[H]
+	\centering
+  	%\includegraphics[width=0.75\textwidth]{Screenshots/}  
+	\caption{Current vs Distance Graph for Load Resistor of $10\si{\kilo\ohm}$}
+	\label{10k_current_graph}
+\end{figure}
+
+% 20k Ohm Voltage Graph
+\begin{figure}[H]
+	\centering
+  	%\includegraphics[width=0.75\textwidth]{Screenshots/}  
+	\caption{Voltage vs Distance Graph for Load Resistor of $20\si{\kilo\ohm}$}
+	\label{20k_voltage_graph}
+\end{figure}
+
+The current at each distance measurement is calculated for the $20\si{\kilo\ohm}$ load resistor the same was it is calculated for the $10\si{\kilo\ohm}$ load resistor. The current vs distance plot is shown below in Figure \ref{20k_current_graph}.
+% 20k Ohm Current Graph
+\begin{figure}[H]
+	\centering
+  	%\includegraphics[width=0.75\textwidth]{Screenshots/}  
+	\caption{Current vs Distance Graph for Load Resistor of $20\si{\kilo\ohm}$}
+	\label{20k_current_graph}
+\end{figure}
+
+% Part 2 -------------------------------------------------------------
 
 %Conclusion Section
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
+% Sum up the lab. Mention it was successful
 
 %\fi % -------------------------------------------------------------------------------------------------------------------------------
+\section*{Questions}
+\addcontentsline{toc}{section}{Questions}
+
+\subsection*{Question 1}
+The 74LS14 with Schmitt trigger differs from the 7406 inverter because it uses 2 edge trigger values when determining outputs, whereas the 7406 uses 1 trigger edge to determine whether to drive the output high or low. The advantage of the 74LS14 with Schmitt trigger is that it is very effective in filtering out noise. There are thresholds set for high and low values, and when those values are reached, the output is driven either high or low. However, any voltage value falling between the 2 triggers (for example, 2.5 \si{\volt} on a scale from 0 - 5 \si{\volt}) could be interpreted as either high or low, since it is right on the border. The Schmitt trigger will read this value as noise, and will maintain the most recent output until the opposite threshold gets crossed. The 7406 will flip back and forth as noise interferes with the input, so there would be short, unexpected pulses in ranges that should be held at a constant output.  
+\subsection*{Question 2}
+The voltage from the optoisolator starts at close to the source voltage (5 \si{\volt}), because there is no way for any light to get reflected when the output diode is completely covered. Then, as soon as any light escapes that hole and gets reflected at a very close distance, the voltage drops down to the lower rail value (close to 0 \si{\volt}). As the distance increases, less light gets reflected, the voltage begins to increase from the lower rail up to the voltage source (upper rail). 
+\subsection*{Question 3}
+When doubling the load resistor from $10\si{\kilo\ohm}$ to $20\si{\kilo\ohm}$, the maximum frequency that the circuit can operate at is halved. In this exercise, the maximum working frequency decreased from $700 \si{\hertz}$ to $400 \si{\hertz}$, which is roughly half. This matches the expected behavior, because it follows that a larger resistance/ impedance would limit the amount of current flow through the circuit, which will cap the maximum frequency the circuit can handle. 
+\\ *** TODO *** check this
 
 \newpage
-%\includepdf[pages=-,pagecommand={},width=\paperwidth]{Screenshots/lab2_signoff.pdf}
+%\includepdf[pages=-,pagecommand={},width=\paperwidth]{Screenshots/}
 
 \end{document}
