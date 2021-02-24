@@ -2,7 +2,7 @@
 IDE NXP Cup and Team Labs
 
 ## Usage
-- Each lab will have its own branch. Be sure you are working on the correct branch for the lab. As we approach the car, we can add more branches for version control tracking and speed experimentation.
+- Each lab will have its own branch. Be sure you are working on the correct branch for the lab. As we approach the car, we can add more branches for version control tracking and experimentation.
 
 - There is a `code` directory. In here is all of the source code used.
 - Every other package contains a Keil project, but no code. All the code is added as an existing file from the `code` directory.
