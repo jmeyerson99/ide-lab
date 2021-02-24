@@ -13,9 +13,6 @@ Date: 2/26/21
 #include "led.h"
 #include "switch.h"
 
-/* LED State ENUM */
-typedef enum {OFF=0, ON=1} LED_State;
-
 /* Boolean typedef */
 typedef enum {FALSE=0, TRUE=1} bool;
 
