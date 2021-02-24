@@ -11,7 +11,7 @@ Date: 2/26/21
 #include "switch.h"
 #include <stdio.h>
 
-/*From clock setup 0 in system_MK64f12.c*/
+/* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
 
 void PDB_Init(void);
@@ -20,7 +20,7 @@ void FTM_Init(void);
 void Interrupts_Init(void);
 
 int main(void){
-	//initializations
+	// initializations
 	PDB_Init();
 	GPIO_Init();
 	FTM_Init();
