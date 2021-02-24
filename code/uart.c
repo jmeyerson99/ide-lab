@@ -158,8 +158,7 @@ void UART3_Put(char *ptr_str) {
 }
 
 void UART0_PutNumU(int i) {
-	// uint8_t *str;
-	char str[20000]; // TODO - find a better way to do this
+	char str[CHAR_COUNT];
 	sprintf(str, "%u", i);
-	UART0_Put(str);
+	UART0_Put( str);
 }

@@ -1,5 +1,5 @@
 /*
-Title: Led.h
+Title: led.h
 Purpose: On-board LED interface
 Name: Jacob Meyerson
 Date: 1/29/21
