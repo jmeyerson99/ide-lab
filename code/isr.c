@@ -14,7 +14,6 @@ static bool switch_2_pressed = FALSE;
 static PDB_State pdb_state = DISABLED;
 
 void PDB0_IRQHandler(void){ // For PDB timer
-	UART0_Put("PDB ISR \n\r");// DEBUG - this never prints
 	// Clear the interrupt in register PDB0_SC
 	PDB0_SC &= ~(PDB_SC_PDBIF_MASK);
 	
@@ -33,7 +32,6 @@ void FTM0_IRQHandler(void){ // For FTM timer
 }
 	
 void PORTA_IRQHandler(void){ // For switch 3
-	// UART0_Put("Switch 3 pressed \r\n"); // DEBUG
 	// Clear the interrupt
 	PORTA_ISFR &= ~(PORT_ISFR_ISF(4));
 	
@@ -45,7 +43,7 @@ void PORTA_IRQHandler(void){ // For switch 3
 	else {
 		// Enable the timer and start it with a trigger
 		pdb_state = ENABLED;
-		PDB0_SC |= PDB_SC_PDBEN_MASK; // Enable the PDB
+		PDB0_SC |= PDB_SC_PDBEN_MASK;  // Enable the PDB
 		PDB0_SC |= PDB_SC_SWTRIG_MASK; // Start the SW Triggering again to start the timer
 	}
 }

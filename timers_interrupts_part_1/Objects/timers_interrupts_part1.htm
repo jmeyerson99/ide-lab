@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\timers_interrupts_part1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\timers_interrupts_part1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Wed Feb 24 12:01:34 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Wed Feb 24 13:30:02 2021
 <BR><P>
 <H3>Maximum Stack Usage =      20152 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -736,14 +736,10 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
 </UL>
 
-<P><STRONG><a name="[3e]"></a>PDB0_IRQHandler</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, isr.o(.text.PDB0_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PDB0_IRQHandler &rArr; UART0_Put
-</UL>
-<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
-</UL>
+<P><STRONG><a name="[3e]"></a>PDB0_IRQHandler</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, isr.o(.text.PDB0_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[8b]"></a>PDB_Init</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, interrupts_main.o(.text.PDB_Init))
+<P><STRONG><a name="[8b]"></a>PDB_Init</STRONG> (Thumb, 100 bytes, Stack size 0 bytes, interrupts_main.o(.text.PDB_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -755,8 +751,8 @@ Global Symbols
 <LI>Call Chain = PORTC_IRQHandler &rArr; UART0_PutNumU &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch2_Pressed
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch2_Pressed
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
@@ -764,7 +760,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
 </UL>
 
-<P><STRONG><a name="[88]"></a>Switch2_Pressed</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, switch.o(.text.Switch2_Pressed))
+<P><STRONG><a name="[87]"></a>Switch2_Pressed</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, switch.o(.text.Switch2_Pressed))
 <BR><BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
 </UL>
 
@@ -779,14 +775,13 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[87]"></a>UART0_Put</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, uart.o(.text.UART0_Put))
+<P><STRONG><a name="[88]"></a>UART0_Put</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, uart.o(.text.UART0_Put))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UART0_Put
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Putchar
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
-<LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PDB0_IRQHandler
 </UL>
 
 <P><STRONG><a name="[89]"></a>UART0_PutNumU</STRONG> (Thumb, 40 bytes, Stack size 20016 bytes, uart.o(.text.UART0_PutNumU))
@@ -794,13 +789,13 @@ Global Symbols
 <LI>Call Chain = UART0_PutNumU &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 <BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
 </UL>
 
 <P><STRONG><a name="[8a]"></a>UART0_Putchar</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart.o(.text.UART0_Putchar))
-<BR><BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 
 <P><STRONG><a name="[73]"></a>main</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, interrupts_main.o(.text.main))

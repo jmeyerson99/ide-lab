@@ -38,15 +38,16 @@ void PDB_Init(void){
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
+	PDB0_SC |= PDB_SC_CONT_MASK;    // continuous mode
 	PDB0_SC |= PDB_SC_PRESCALER(7); // same as (111 >> (PDB_SC_PRESCALER_SHIFT)) & (PDB_SC_PRESCALER_MASK)
 	PDB0_SC |= PDB_SC_MULT(2);      // 10 binary is factor of 20
-	PDB0_SC |= PDB_SC_SWTRIG_MASK;  // bit 16
+	PDB0_SC |= PDB_SC_TRGSEL(15);   // set the PDB for software triggering
 	PDB0_SC |= PDB_SC_PDBEN_MASK;   // bit 7
 
 	// Set the mod field to get a 1 second period.
 	// There is a division by 2 to make the LED blinking period 1 second.
 	// This translates to two mod counts in one second (one for on, one for off)
-	PDB0_MOD |= PDB_MOD_MOD(DEFAULT_SYSTEM_CLOCK / (128*20));
+	PDB0_MOD = PDB_MOD_MOD(DEFAULT_SYSTEM_CLOCK / (128*20));
 
 	// Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
@@ -56,6 +57,8 @@ void PDB_Init(void){
 
 	// Enable LDOK to have PDB0_SC register changes loaded.
 	PDB0_SC |= PDB_SC_LDOK_MASK;
+	
+	PDB0_SC |= PDB_SC_SWTRIG_MASK;  // Turn on the timer
 }
 
 void FTM_Init(void){
