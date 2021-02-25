@@ -114,8 +114,15 @@ int main(void) {
 	#define TEMP_SENSOR
 	for(;;) {
 #ifdef TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion*/
-		double celcius = (((3300.0/65535) * ADC1_RA) - 500)/10; // TODO - figure out why this works
-		double fahrenheit = ((9.0/5.0) * celcius) + 32;
+		// NOTE: Use the following to convert voltage to temperature
+		// Vcc = 3.3 V 
+		// Offset = 0.5 V (Table 4 & Figure 6)
+		// Resolution = 16 bits
+		// Output voltage scaling = 10 mV / C (Table 4)
+		// Output at 25 C = 750 mV (Table 4)
+		// Celcius = ((3300 mV / (2^16) levels) * ADC) - 500 mV / 10 mV
+		double celcius = (((3300.0/65536) * ADC1_RA) - 500) / 10;
+		double fahrenheit = ((9.0/5.0) * celcius) + 32.0;
 		sprintf(str,"\n Celcius: %f Fahrenheit: %f \n\r", celcius, fahrenheit);
 		UART0_Put(str);
 #else /* TEMP_SENSOR */
