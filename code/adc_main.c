@@ -111,13 +111,20 @@ int main(void) {
 	// Start the PDB (ADC Conversions)
 	PDB0_SC |= PDB_SC_SWTRIG_MASK;
 
+	#define TEMP_SENSOR
 	for(;;) {
+#ifdef TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion*/
+		double celcius = (((3300.0/65535) * ADC1_RA) - 500)/10; // TODO - figure out why this works
+		double fahrenheit = ((9.0/5.0) * celcius) + 32;
+		sprintf(str,"\n Celcius: %f Fahrenheit: %f \n\r", celcius, fahrenheit);
+		UART0_Put(str);
+#else /* TEMP_SENSOR */
 		sprintf(str,"\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
 		UART0_Put(str);
+#endif /* TEMP_SENSOR */
 		for(i = 0; i < 5000000; ++i ){
 			// TODO - something happens here?	Or is this to delay?	
 		}
-		Delay(); // TODO - slow down the printing, should prolly get replaced by something later
 	}
 }
  
