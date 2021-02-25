@@ -2,6 +2,20 @@
 IDE NXP Cup and Team Labs
 
 ## Usage
+Everything is done from the main folder 
+- To push your changes: 
+  - `git add .`
+  - `git commit -am "<Add descriptive message about your changes>"`
+  - `git push`
+
+- To pull recent changes:
+  - `git pull`
+
+- To switch branches:
+  - `git branch` will print all branches
+  - `git checkout <branch_name>` will switch you to the branch `branch_name`
+
+## Structure
 - Each lab will have its own branch. Be sure you are working on the correct branch for the lab. As we approach the car, we can add more branches for version control tracking and experimentation.
 
 - There is a `code` directory. In here is all of the source code used.
