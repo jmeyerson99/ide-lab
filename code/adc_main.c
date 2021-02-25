@@ -73,6 +73,7 @@ void ADC1_Init() {
 	// Configure SC1A register.
 	// Select ADC Channel and enable interrupts. Use ADC1 channel DADP3 in single ended mode.
 	// NOTE: use "=" for the macro, then use |= for the masks. If the macro goes last, then the register has to be cleared before it can be set. 
+	ADC1_SC1A = 0;
 	ADC1_SC1A = ADC_SC1_ADCH(3); // 00011 is for DADP3 or DAD3, chooses  DADP3 when DIFF = 0
 	ADC1_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts
 	ADC1_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0
@@ -111,7 +112,7 @@ int main(void) {
 	// Start the PDB (ADC Conversions)
 	PDB0_SC |= PDB_SC_SWTRIG_MASK;
 
-	#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion*/
+	#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion */
 	for(;;) {
 #ifdef TEMP_SENSOR /* TEMP_SENSOR */
 		// NOTE: Use the following to convert voltage to temperature
@@ -121,7 +122,7 @@ int main(void) {
 		// Output voltage scaling = 10 mV / C (Table 4)
 		// Output at 25 C = 750 mV (Table 4)
 		// Celcius = ((3300 mV / (2^16) levels) * ADC) - 500 mV / 10 mV
-		double celcius = (((3300.0/65536) * ADC1_RA) - 500) / 10;
+		double celcius = (((3300.0/65536.0) * ADC1_RA) - 500.0) / 10.0;
 		double fahrenheit = ((9.0/5.0) * celcius) + 32.0;
 		sprintf(str,"\n Celcius: %f Fahrenheit: %f \n\r", celcius, fahrenheit);
 		UART0_Put(str);
@@ -130,8 +131,7 @@ int main(void) {
 		UART0_Put(str);
 #endif /* TEMP_SENSOR */
 		for(i = 0; i < 5000000; ++i ){
-			// TODO - something happens here?	Or is this to delay?	
+			// Use this for delay in printing results
 		}
 	}
 }
- 
