@@ -164,7 +164,7 @@ void PIT0_IRQHandler(void){
 	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK);// TODO - n
 	
 	// Setting mod resets the FTM counter
-	//INSERT CODE HERE
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
 	
 	// Enable FTM2 interrupts (camera)
 	FTM2_SC |= FTM_SC_TOIE_MASK;
@@ -181,7 +181,7 @@ void FTM2_Init(){
 	
 	// Set output to '1' on init
 	FTM2_MODE |= FTM_MODE_INIT_MASK;
-	FTM2_OUTINIT |= FTM_OUTINIT_CH2OI_MASK; // TODO - what channel are we using????
+	FTM2_OUTINIT |= FTM_OUTINIT_CH0OI_MASK; // NOTE: channel 0
 	
 	// Initialize the CNT to 0 before writing to MOD
 	FTM2_CNT &= ~(FTM_CNT_COUNT_MASK);
@@ -195,6 +195,9 @@ void FTM2_Init(){
 	// 50% duty
 	//INSERT CODE HERE
 	// CNV - CNTIN
+	FTM2_C0V |= FTM_CnV_VAL((DEFAULT_SYSTEM_CLOCK)/(100)/2); //TODO - check this (maybe 200)
+	//NOTE: CNTIN = 0x0000 in EPWM mode
+	//NOTE: 50% of the MOD register (~5us)
 	
 	// Set edge-aligned mode
 	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
@@ -297,14 +300,11 @@ void ADC0_Init(void) {
 	
 	// Select hardware trigger.
 	ADC0_SC2 |= ADC_SC2_ADTRG_MASK; // set to 1 for hardware trigger (0 for software trigger)
-    
-  // Set to single ended mode	
-	//INSERT CODE HERE
 	
 	// Set up FTM2 trigger on ADC0
-	//INSERT CODE HERE // FTM2 select
-	//INSERT CODE HERE // Alternative trigger en.
-	//INSERT CODE HERE // Pretrigger A
+	SIM_SOPT7 |= SIM_SOPT7_ADC0TRGSEL(10); // 1010 - FTM2 trigger select
+  SIM_SOPT7 |= SIM_SOPT7_ADC0ALTTRGEN_MASK; // alternative trigger edge enabled
+  SIM_SOPT7 &= ~(SIM_SOPT7_ADC0PRETRGSEL_MASK); // Pretrigger A
 	
 	// Enable NVIC interrupt
 	NVIC_EnableIRQ(ADC0_IRQn);
