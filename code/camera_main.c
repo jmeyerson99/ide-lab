@@ -240,16 +240,16 @@ void PIT_Init(void){
 	
 	// PIT clock frequency is the system clock
 	// Load the value that the timer will count down from
-	PIT_LDVALn = 0x00000000; // TODO - this needs an "n", integration time (300 us - 68 ms), not over 100 ms
+	PIT_LDVAL0 = 0x00000000; //NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms
 	
 	// Enable timer interrupts
-	PIT_TCTRLn |= PIT_TCTRL_TIE_MASK; // TODO - n
+	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK; //NOTE: channel 0
 	
 	// Enable the timer
-	PIT_TCTRLn |= PIT_TCTRL_TEN_MASK; // TODO - n
+	PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK; //NOTE: channel 0
 
 	// Clear interrupt flag
-	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK); // TODO - check channel
+	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK); //NOTE: channel 0
 
 	// Enable PIT interrupt in the interrupt controller
 	NVIC_EnableIRQ(PIT0_IRQn);
