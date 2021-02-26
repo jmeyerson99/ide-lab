@@ -190,7 +190,7 @@ void FTM2_Init(){
 	FTM2_CNT = 0x0000;
 	
 	// Set the period (~10us)
-	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
 	
 	// 50% duty
 	//INSERT CODE HERE
@@ -199,7 +199,7 @@ void FTM2_Init(){
 	// Set edge-aligned mode
 	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
 
-FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
+	FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
 	FTM2_COMBINE &= ~FTM_COMBINE_DECAPEN0_MASK; //NOTE: channel 0
 	FTM2_COMBINE &= ~FTM_COMBINE_COMBINE0_MASK; //NOTE: channel 0
 	FTM2_SC &= ~FTM_SC_CPWMS_MASK;
