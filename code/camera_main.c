@@ -199,11 +199,11 @@ void FTM2_Init(){
 	// Set edge-aligned mode
 	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
 
-	FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; // TODO - n
-	FTM2_COMBINE &= ~FTM_COMBINE_DECAPENn_MASK; //TODO figure out n
-	FTM2_COMBINE &= ~FTM_COMBINE_COMBINEn_MASK; //TODO figure out n
+FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
+	FTM2_COMBINE &= ~FTM_COMBINE_DECAPEN0_MASK; //NOTE: channel 0
+	FTM2_COMBINE &= ~FTM_COMBINE_COMBINE0_MASK; //NOTE: channel 0
 	FTM2_SC &= ~FTM_SC_CPWMS_MASK;
-	FTM2_CnSC |= FTM_CnSC_MSB_MASK;            //TODO look at page 966 find n
+	FTM2_C0SC |= FTM_CnSC_MSB_MASK;            	//NOTE: channel 0
 	
 	// Enable High-true pulses
 	// ELSB = 1, ELSA = 0
