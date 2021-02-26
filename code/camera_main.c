@@ -161,7 +161,7 @@ void PIT0_IRQHandler(void){
 		capcnt += 1;
 	}
 	// Clear interrupt
-	PIT_TFLGn &= ~(PIT_TFLG_TIF_MASK);// TODO - n
+	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK);// TODO - n
 	
 	// Setting mod resets the FTM counter
 	//INSERT CODE HERE
