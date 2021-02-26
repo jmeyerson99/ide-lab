@@ -190,12 +190,12 @@ void FTM2_Init(){
 	FTM2_CNT = 0x0000;
 	
 	// Set the period (~10us)
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51) (maybe 100000)
 	
 	// 50% duty
 	//INSERT CODE HERE
 	// CNV - CNTIN
-	FTM2_C0V |= FTM_CnV_VAL((DEFAULT_SYSTEM_CLOCK)/(100)/2); //TODO - check this (maybe 200)
+	FTM2_C0V |= FTM_CnV_VAL((DEFAULT_SYSTEM_CLOCK)/(100)/2); //TODO - check this (maybe 200) (maybe 100000)
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 	
