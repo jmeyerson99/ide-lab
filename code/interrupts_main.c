@@ -58,7 +58,7 @@ void PDB_Init(void){
 	// Enable LDOK to have PDB0_SC register changes loaded.
 	PDB0_SC |= PDB_SC_LDOK_MASK;
 	
-	PDB0_SC |= PDB_SC_SWTRIG_MASK;  // Turn on the timer
+	//PDB0_SC |= PDB_SC_SWTRIG_MASK;  // Turn on the timer
 }
 
 void FTM_Init(void){
