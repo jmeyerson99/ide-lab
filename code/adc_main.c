@@ -72,7 +72,6 @@ void ADC1_Init() {
 
 	// Configure SC1A register.
 	// Select ADC Channel and enable interrupts. Use ADC1 channel DADP3 in single ended mode.
-	// NOTE: use "=" for the macro, then use |= for the masks. If the macro goes last, then the register has to be cleared before it can be set. 
 	ADC1_SC1A = 0;
 	ADC1_SC1A = ADC_SC1_ADCH(3); // 00011 is for DADP3 or DAD3, chooses  DADP3 when DIFF = 0
 	ADC1_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts

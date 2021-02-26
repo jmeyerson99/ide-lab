@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'adc_part_2' 
+ * Project: 'adc_sensor_part_2' 
  * Target:  'Target 1' 
  */
 
