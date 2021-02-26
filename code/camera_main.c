@@ -211,7 +211,7 @@ void FTM2_Init(){
 	FTM2_C0SC |= FTM_CnSC_ELSB_MASK;
 	
 	// Enable hardware trigger from FTM2
-	FTM2_SYNC |= FTM_SYNC_TRIGn_MASK; // TODO figure out n (page 997)
+	FTM2_EXTTRIG |= FTM_EXTTRIG_CH0TRIG_MASK;
 	
 	// Don't enable interrupts yet (disable)
 	FTM2_SC &= ~(FTM_SC_TOIE_MASK);
