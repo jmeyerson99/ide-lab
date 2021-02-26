@@ -111,7 +111,7 @@ int main(void) {
 	// Start the PDB (ADC Conversions)
 	PDB0_SC |= PDB_SC_SWTRIG_MASK;
 
-	#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion */
+	//#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion */
 	for(;;) {
 #ifdef TEMP_SENSOR /* TEMP_SENSOR */
 		// NOTE: Use the following to convert voltage to temperature

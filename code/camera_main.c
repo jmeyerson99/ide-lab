@@ -240,7 +240,7 @@ void PIT_Init(void){
 	
 	// PIT clock frequency is the system clock
 	// Load the value that the timer will count down from
-	PIT_LDVALn = 0x00000000; // TODO - this needs an "n" and a number - what is the period of the PIT clock?
+	PIT_LDVALn = 0x00000000; // TODO - this needs an "n", integration time (300 us - 68 ms), not over 100 ms
 	
 	// Enable timer interrupts
 	PIT_TCTRLn |= PIT_TCTRL_TIE_MASK; // TODO - n
