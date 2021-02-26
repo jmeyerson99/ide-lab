@@ -161,7 +161,7 @@ void PIT0_IRQHandler(void){
 		capcnt += 1;
 	}
 	// Clear interrupt
-	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK);// TODO - n
+	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK);// NOTE - channel 0
 	
 	// Setting mod resets the FTM counter
 	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
@@ -190,18 +190,15 @@ void FTM2_Init(){
 	FTM2_CNT = 0x0000;
 	
 	// Set the period (~10us)
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51) (maybe 100000)
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	//INSERT CODE HERE
-	// CNV - CNTIN
-	FTM2_C0V |= FTM_CnV_VAL((DEFAULT_SYSTEM_CLOCK)/(100)/2); //TODO - check this (maybe 200) (maybe 100000)
+	FTM2_C0V = (((DEFAULT_SYSTEM_CLOCK)/(100000))/2); // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 	
 	// Set edge-aligned mode
 	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
-
 	FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
 	FTM2_COMBINE &= ~FTM_COMBINE_DECAPEN0_MASK; //NOTE: channel 0
 	FTM2_COMBINE &= ~FTM_COMBINE_COMBINE0_MASK; //NOTE: channel 0
@@ -286,7 +283,7 @@ void ADC0_Init(void) {
   SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
 	
 	// Single ended 16 bit conversion, no clock divider
-	ADC1_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0 for 16 bit conversion
+	ADC0_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0 for 16 bit conversion
 	ADC0_CFG1 |= ADC_CFG1_ADIV(0); // 0 - divide by 1
 	ADC0_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended
     
