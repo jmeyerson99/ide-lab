@@ -160,11 +160,11 @@ void PIT0_IRQHandler(void){
 		//	send line data once every ~2 seconds
 		capcnt += 1;
 	}
-	// Clear interrupt
-	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK);// NOTE - channel 0
+	// Clear interrupt by writing a 1 to TIF bit
+	PIT_TFLG0 |= PIT_TFLG_TIF_MASK; // NOTE - channel 0
 	
 	// Setting mod resets the FTM counter
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100); // TODO - check this (maybe 200) (prescaler 4, MOD = 51)
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// Enable FTM2 interrupts (camera)
 	FTM2_SC |= FTM_SC_TOIE_MASK;
@@ -182,6 +182,7 @@ void FTM2_Init(){
 	// Set output to '1' on init
 	FTM2_MODE |= FTM_MODE_INIT_MASK;
 	FTM2_OUTINIT |= FTM_OUTINIT_CH0OI_MASK; // NOTE: channel 0
+	FTM2_MODE |= FTM_MODE_FTMEN_MASK; // enable all registers
 	
 	// Initialize the CNT to 0 before writing to MOD
 	FTM2_CNT &= ~(FTM_CNT_COUNT_MASK);
@@ -222,6 +223,9 @@ void FTM2_Init(){
 	
 	// Set up interrupt
 	FTM0_SC |= FTM_SC_TOIE_MASK;
+
+	// Enable IRQ
+	NVIC_EnableIRQ(FTM2_IRQn);
 }
 
 /* Initialization of PIT timer to control 
@@ -233,14 +237,14 @@ void PIT_Init(void){
 	// Enable clock for timers
 	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
 	
-	PIT_MCR |= PIT_MCR_MDIS_MASK; // Disable module before performing setup steps
+	PIT_MCR &= ~(PIT_MCR_MDIS_MASK); // Enable module before pany other setup is done
 	
 	// Enable timers to continue in debug mode
 	PIT_MCR &= ~(PIT_MCR_FRZ_MASK); // In case you need to debug
 	
 	// PIT clock frequency is the system clock
 	// Load the value that the timer will count down from
-	PIT_LDVAL0 = 0x00000000; //NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms
+	PIT_LDVAL0 = 0x00000000; // NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms TODO - change this value
 	
 	// Enable timer interrupts
 	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK; //NOTE: channel 0
@@ -248,13 +252,11 @@ void PIT_Init(void){
 	// Enable the timer
 	PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK; //NOTE: channel 0
 
-	// Clear interrupt flag
-	PIT_TFLG0 &= ~(PIT_TFLG_TIF_MASK); //NOTE: channel 0
+	// Clear interrupt by writing a 1 to TIF bit
+	PIT_TFLG0 |= PIT_TFLG_TIF_MASK; // NOTE - channel 0
 
 	// Enable PIT interrupt in the interrupt controller
 	NVIC_EnableIRQ(PIT0_IRQn);
-	
-	PIT_MCR &= ~(PIT_MCR_MDIS_MASK); // Re-enable module after completing setup
 }
 
 
@@ -267,10 +269,11 @@ void GPIO_Init(void){
 	// Enable LED and GPIO so we can see results
 	LED_Init();
 	
+	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK; // Enable clock on PORTB
 	// Initialize PTB9 as an output (camera clock)
 	PORTB_PCR9 = PORT_PCR_MUX(1);
-	GPIOB_PDDR |= (0 << 9);
-	// Initialize PTB23 as an input (camera SI)
+	GPIOB_PDDR |= (1 << 9);
+	// Initialize PTB23 as an output (camera SI)
 	PORTB_PCR23 = PORT_PCR_MUX(1);
 	GPIOB_PDDR |= (1 << 23);
 }
@@ -283,10 +286,14 @@ void ADC0_Init(void) {
   SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
 	
 	// Single ended 16 bit conversion, no clock divider
+	ADC1_SC1A = 0;
 	ADC0_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0 for 16 bit conversion
 	ADC0_CFG1 |= ADC_CFG1_ADIV(0); // 0 - divide by 1
 	ADC0_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended
-    
+	
+	ADC0_SC1A |= ADC_SC1_ADCH(3); // 00011 is for DADP3 or DAD3, chooses  DADP3 when DIFF = 0
+	ADC0_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts
+
 	// Do ADC Calibration for Singled Ended ADC. Do not touch.
 	ADC0_SC3 = ADC_SC3_CAL_MASK;
 	while ( (ADC0_SC3 & ADC_SC3_CAL_MASK) != 0 );
