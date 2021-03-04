@@ -69,9 +69,13 @@ int main(void)
 	// Initialize all modules
 	UART0_Init();
 	GPIO_Init(); // For CLK and SI output on GPIO
+	UART0_Put("GPIO Init Done\r\n"); // DEBUG
 	FTM2_Init(); // To generate CLK, SI, and trigger ADC
+	UART0_Put("FTM Init Done\r\n"); // DEBUG
 	ADC0_Init();
+	UART0_Put("ADC Init Done\r\n"); // DEBUG
 	PIT_Init();	// To trigger camera read based on integration time
+	UART0_Put("PIT Init Done\r\n"); // DEBUG
 	
 	for(;;) {
 
@@ -111,12 +115,12 @@ void ADC0_IRQHandler(void) {
 *		toggles clk for 128 cycles, and stores the line
 *		data from the ADC into the line variable
 */
-void FTM2_IRQHandler(void){ //For FTM timer
+void FTM2_IRQHandler(void){ // For FTM timer
 	// Clear interrupt
   FTM2_SC &= ~(FTM_SC_TOF_MASK);
 	
 	// Toggle clk
-	clkval = ~(clkval);
+	GPIOB_PTOR = (1 << 9);
 	
 	// Line capture logic
 	if ((pixcnt >= 2) && (pixcnt < 256)) {
@@ -197,7 +201,7 @@ void FTM2_Init(){
 	FTM2_C0V = (((DEFAULT_SYSTEM_CLOCK)/(100000))/2); // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
-	
+
 	// Set edge-aligned mode
 	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
 	FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
@@ -222,10 +226,13 @@ void FTM2_Init(){
 	FTM2_SC |= FTM_SC_CLKS(1); // 1 = system clock
 	
 	// Set up interrupt
-	FTM0_SC |= FTM_SC_TOIE_MASK;
+	FTM2_SC |= FTM_SC_TOIE_MASK;
 
 	// Enable IRQ
 	NVIC_EnableIRQ(FTM2_IRQn);
+	
+	// Re enable write protection
+	FTM2_MODE &= ~(FTM_MODE_WPDIS_MASK);
 }
 
 /* Initialization of PIT timer to control 
@@ -244,7 +251,7 @@ void PIT_Init(void){
 	
 	// PIT clock frequency is the system clock
 	// Load the value that the timer will count down from
-	PIT_LDVAL0 = 0x00000000; // NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms TODO - change this value
+	PIT_LDVAL0 = (unsigned int)(INTEGRATION_TIME*(float)DEFAULT_SYSTEM_CLOCK); // NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms TODO - change this value
 	
 	// Enable timer interrupts
 	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK; //NOTE: channel 0
@@ -286,7 +293,7 @@ void ADC0_Init(void) {
   SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
 	
 	// Single ended 16 bit conversion, no clock divider
-	ADC1_SC1A = 0;
+	ADC0_SC1A = 0;
 	ADC0_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0 for 16 bit conversion
 	ADC0_CFG1 |= ADC_CFG1_ADIV(0); // 0 - divide by 1
 	ADC0_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended

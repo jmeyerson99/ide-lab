@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\timers_interrupts_part1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\timers_interrupts_part1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Fri Feb 26 09:23:49 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Thu Mar  4 09:16:17 2021
 <BR><P>
 <H3>Maximum Stack Usage =        224 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -621,7 +621,7 @@ Global Symbols
 <LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_char_common
 </UL>
 <BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
+<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
 </UL>
 
 <P><STRONG><a name="[7d]"></a>__printf</STRONG> (Thumb, 104 bytes, Stack size 24 bytes, __printf.o(.text))
@@ -708,7 +708,7 @@ Global Symbols
 <P><STRONG><a name="[31]"></a>ADC0_IRQHandler</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, camera_main.o(.text.ADC0_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[82]"></a>ADC0_Init</STRONG> (Thumb, 154 bytes, Stack size 8 bytes, camera_main.o(.text.ADC0_Init))
+<P><STRONG><a name="[82]"></a>ADC0_Init</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, camera_main.o(.text.ADC0_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ADC0_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_EnableIRQ
@@ -719,42 +719,44 @@ Global Symbols
 <P><STRONG><a name="[34]"></a>FTM0_IRQHandler</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, isr.o(.text.FTM0_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[36]"></a>FTM2_IRQHandler</STRONG> (Thumb, 218 bytes, Stack size 8 bytes, camera_main.o(.text.FTM2_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = FTM2_IRQHandler
-</UL>
+<P><STRONG><a name="[36]"></a>FTM2_IRQHandler</STRONG> (Thumb, 174 bytes, Stack size 0 bytes, camera_main.o(.text.FTM2_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[8d]"></a>FTM2_Init</STRONG> (Thumb, 188 bytes, Stack size 0 bytes, camera_main.o(.text.FTM2_Init))
-<BR><BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<P><STRONG><a name="[84]"></a>FTM2_Init</STRONG> (Thumb, 192 bytes, Stack size 8 bytes, camera_main.o(.text.FTM2_Init))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = FTM2_Init
 </UL>
-
-<P><STRONG><a name="[84]"></a>GPIO_Init</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, camera_main.o(.text.GPIO_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = GPIO_Init &rArr; LED_Init
-</UL>
-<BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
+<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_EnableIRQ
 </UL>
 <BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[85]"></a>LED_Init</STRONG> (Thumb, 86 bytes, Stack size 8 bytes, led.o(.text.LED_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = LED_Init
+<P><STRONG><a name="[85]"></a>GPIO_Init</STRONG> (Thumb, 64 bytes, Stack size 8 bytes, camera_main.o(.text.GPIO_Init))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = GPIO_Init &rArr; LED_Init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Off
+<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
+<BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[86]"></a>LED_Off</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, led.o(.text.LED_Off))
-<BR><BR>[Called By]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
+<P><STRONG><a name="[86]"></a>LED_Init</STRONG> (Thumb, 86 bytes, Stack size 8 bytes, led.o(.text.LED_Init))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = LED_Init
+</UL>
+<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Off
+</UL>
+<BR>[Called By]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
+</UL>
+
+<P><STRONG><a name="[87]"></a>LED_Off</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, led.o(.text.LED_Off))
+<BR><BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
 </UL>
 
 <P><STRONG><a name="[3e]"></a>PDB0_IRQHandler</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, isr.o(.text.PDB0_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[3a]"></a>PIT0_IRQHandler</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, camera_main.o(.text.PIT0_IRQHandler))
+<P><STRONG><a name="[3a]"></a>PIT0_IRQHandler</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, camera_main.o(.text.PIT0_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[87]"></a>PIT_Init</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, camera_main.o(.text.PIT_Init))
+<P><STRONG><a name="[88]"></a>PIT_Init</STRONG> (Thumb, 98 bytes, Stack size 8 bytes, camera_main.o(.text.PIT_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PIT_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_EnableIRQ
@@ -769,58 +771,58 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 224 + Unknown Stack Size
 <LI>Call Chain = PORTC_IRQHandler &rArr; UART0_PutNumU &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch2_Pressed
+<BR>[Calls]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
+<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch2_Pressed
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[88]"></a>Switch2_Pressed</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, switch.o(.text.Switch2_Pressed))
+<P><STRONG><a name="[89]"></a>Switch2_Pressed</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, switch.o(.text.Switch2_Pressed))
 <BR><BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
 </UL>
 
 <P><STRONG><a name="[61]"></a>SystemInit</STRONG> (Thumb, 154 bytes, Stack size 0 bytes, system_mk64f12.o(.text.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(.text)
 </UL>
-<P><STRONG><a name="[8c]"></a>UART0_Init</STRONG> (Thumb, 128 bytes, Stack size 0 bytes, uart.o(.text.UART0_Init))
+<P><STRONG><a name="[8d]"></a>UART0_Init</STRONG> (Thumb, 128 bytes, Stack size 0 bytes, uart.o(.text.UART0_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[89]"></a>UART0_Put</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, uart.o(.text.UART0_Put))
+<P><STRONG><a name="[8a]"></a>UART0_Put</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, uart.o(.text.UART0_Put))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UART0_Put
 </UL>
-<BR>[Calls]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Putchar
+<BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Putchar
 </UL>
 <BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
+<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_PutNumU
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
 </UL>
 
-<P><STRONG><a name="[8a]"></a>UART0_PutNumU</STRONG> (Thumb, 32 bytes, Stack size 88 bytes, uart.o(.text.UART0_PutNumU))
+<P><STRONG><a name="[8b]"></a>UART0_PutNumU</STRONG> (Thumb, 32 bytes, Stack size 88 bytes, uart.o(.text.UART0_PutNumU))
 <BR><BR>[Stack]<UL><LI>Max Depth = 208 + Unknown Stack Size
 <LI>Call Chain = UART0_PutNumU &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 <BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORTC_IRQHandler
 </UL>
 
-<P><STRONG><a name="[8b]"></a>UART0_Putchar</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart.o(.text.UART0_Putchar))
-<BR><BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<P><STRONG><a name="[8c]"></a>UART0_Putchar</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart.o(.text.UART0_Putchar))
+<BR><BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 
-<P><STRONG><a name="[75]"></a>main</STRONG> (Thumb, 204 bytes, Stack size 8 bytes, camera_main.o(.text.main))
+<P><STRONG><a name="[75]"></a>main</STRONG> (Thumb, 304 bytes, Stack size 8 bytes, camera_main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128 + Unknown Stack Size
 <LI>Call Chain = main &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PIT_Init
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
-<LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_Init
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PIT_Init
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_Init
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_Init
-<LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 <BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
@@ -837,7 +839,8 @@ Global Symbols
 Local Symbols
 </H3>
 <P><STRONG><a name="[83]"></a>__NVIC_EnableIRQ</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, camera_main.o(.text.__NVIC_EnableIRQ))
-<BR><BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PIT_Init
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PIT_Init
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_Init
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_Init
 </UL>
 
