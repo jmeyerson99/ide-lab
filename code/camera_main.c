@@ -35,7 +35,7 @@
 // Don't exceed 100ms or the caps will saturate
 // Must be above 1.25 ms based on camera clk 
 //	(camera clk is the mod value set in FTM2)
-#define INTEGRATION_TIME .0075f
+#define INTEGRATION_TIME (5.2f * .0075f) //NOTE: default = .0075
 
 void FTM2_Init(void);
 void GPIO_Init(void);
@@ -48,16 +48,16 @@ void ADC0_IRQHandler(void);
 // Pixel counter for camera logic
 // Starts at -2 so that the SI pulse occurs
 //		ADC reads start
-int pixcnt = -2;
+static int pixcnt = -2;
 // clkval toggles with each FTM interrupt
 static int clkval = 0;
 // line stores the current array of camera data
-uint16_t line[128];
+static uint16_t line[128];
 
 // These variables are for streaming the camera data over UART
-int debugcamdata = 0;
+static int debugcamdata = 0;
 static int capcnt = 0;
-char str[100];
+static char str[100];
 
 // ADC0VAL holds the current ADC value
 static uint16_t ADC0VAL;
@@ -69,13 +69,9 @@ int main(void)
 	// Initialize all modules
 	UART0_Init();
 	GPIO_Init(); // For CLK and SI output on GPIO
-	UART0_Put("GPIO Init Done\r\n"); // DEBUG
 	FTM2_Init(); // To generate CLK, SI, and trigger ADC
-	UART0_Put("FTM Init Done\r\n"); // DEBUG
 	ADC0_Init();
-	UART0_Put("ADC Init Done\r\n"); // DEBUG
 	PIT_Init();	// To trigger camera read based on integration time
-	UART0_Put("PIT Init Done\r\n"); // DEBUG
 	
 	for(;;) {
 
@@ -195,10 +191,10 @@ void FTM2_Init(){
 	FTM2_CNT = 0x0000;
 	
 	// Set the period (~10us)
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000)/2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	FTM2_C0V = (((DEFAULT_SYSTEM_CLOCK)/(100000))/2); // NOTE: DUTY CYCLE = MOD / 2
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2; // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 
@@ -251,7 +247,7 @@ void PIT_Init(void){
 	
 	// PIT clock frequency is the system clock
 	// Load the value that the timer will count down from
-	PIT_LDVAL0 = (unsigned int)(INTEGRATION_TIME*(float)DEFAULT_SYSTEM_CLOCK); // NOTE: channel 0, integration time (300 us - 68 ms), not over 100 ms TODO - change this value
+	PIT_LDVAL0 = (unsigned int)(INTEGRATION_TIME*(float)DEFAULT_SYSTEM_CLOCK); // NOTE: channel 0, integration time (33.75 us - 100 ms)
 	
 	// Enable timer interrupts
 	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK; //NOTE: channel 0

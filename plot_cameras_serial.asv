@@ -92,14 +92,11 @@ plot(smoothtrace);
 %THRESHOLD
 %calculate 1's and 0's via thresholding
 maxval = max(smoothtrace);
-bintrace = trace;
 for i = 1:128
     %Edge detection (binary 0 or 1)
     %INSERT CODE
     if(maxval/2 > trace(i))
-        bintrace(i) = 0;
     else
-        bintrace(i) = 1;
     end
 end
 drawnow;
