@@ -27,10 +27,23 @@ Project File Date:  03/04/2021
 <h2>Output:</h2>
 *** Using Compiler 'V6.15', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
+../code/camera_main.c(55): warning: no previous extern declaration for non-static variable 'line' [-Wmissing-variable-declarations]
+uint16_t line[128];
+         ^
+../code/camera_main.c(55): note: declare 'static' if the variable is not intended to be used outside of this translation unit
+uint16_t line[128];
+^
+../code/camera_main.c(63): warning: no previous extern declaration for non-static variable 'ADC0VAL' [-Wmissing-variable-declarations]
+uint16_t ADC0VAL;
+         ^
+../code/camera_main.c(63): note: declare 'static' if the variable is not intended to be used outside of this translation unit
+uint16_t ADC0VAL;
+^
+2 warnings generated.
 compiling camera_main.c...
 linking...
-Program Size: Code=2444 RO-data=1056 RW-data=4 ZI-data=1136  
-".\Objects\timers_interrupts_part1.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=2668 RO-data=1064 RW-data=4 ZI-data=1496  
+".\Objects\timers_interrupts_part1.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -58,7 +71,7 @@ Package Vendor: Keil
    * Component: Keil::Device:Startup:1.0.0
       Source file:   Device\Source\system_MK64F12.c
       Source file:   Device\Source\ARM\startup_MK64F12.s
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>

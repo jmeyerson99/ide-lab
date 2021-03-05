@@ -35,7 +35,7 @@
 // Don't exceed 100ms or the caps will saturate
 // Must be above 1.25 ms based on camera clk 
 //	(camera clk is the mod value set in FTM2)
-#define INTEGRATION_TIME (5.2f * .0075f) //NOTE: default = .0075
+#define INTEGRATION_TIME (2.0f * .0075f) //NOTE: default = .0075 //NOTE: this will change based on light levels??? More light, less time
 
 void FTM2_Init(void);
 void GPIO_Init(void);
@@ -55,7 +55,7 @@ static int clkval = 0;
 static uint16_t line[128];
 
 // These variables are for streaming the camera data over UART
-static int debugcamdata = 0;
+static int debugcamdata = 1;
 static int capcnt = 0;
 static char str[100];
 
@@ -78,13 +78,13 @@ int main(void)
 		if (debugcamdata) {
 			// Every 2 seconds
 			//if (capcnt >= (2/INTEGRATION_TIME)) {
-			if (capcnt >= (500)) {
+			if (capcnt >= (175)) {
 				GPIOB_PCOR |= (1 << 22);
 				// send the array over uart
 				sprintf(str,"%i\n\r",-1); // start value
 				UART0_Put(str);
 				for (i = 0; i < 127; i++) {
-					sprintf(str,"%i\n", line[i]);
+					sprintf(str,"%i\n\r", line[i]);
 					UART0_Put(str);
 				}
 				sprintf(str,"%i\n\r",-2); // end value
@@ -294,7 +294,7 @@ void ADC0_Init(void) {
 	ADC0_CFG1 |= ADC_CFG1_ADIV(0); // 0 - divide by 1
 	ADC0_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended
 	
-	ADC0_SC1A |= ADC_SC1_ADCH(3); // 00011 is for DADP3 or DAD3, chooses  DADP3 when DIFF = 0
+	ADC0_SC1A |= ADC_SC1_ADCH(0); // 00000 is for DADP0 or DAD0, chooses  DADP0 when DIFF = 0
 	ADC0_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts
 
 	// Do ADC Calibration for Singled Ended ADC. Do not touch.

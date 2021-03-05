@@ -16,13 +16,14 @@
 %delete(instrfindall)
 %
 
-function plot_cams 
+function plot_cameras_serial 
 
+delete(instrfindall);
 %Send over bluetooth or serial
 serialPort = 'COM3';
 serialObject = serial(serialPort);
 %configure serial connection
-serialObject.BaudRate = 115200; %(Default)
+serialObject.BaudRate = 9600; %(Default)
 %serialObject.BaudRate = 115200;
 %serialObject.FlowControl = 'software';
 
@@ -51,7 +52,7 @@ while (1)
                 plotdata(trace, 1);
             end %otherwise there was an error and don't plot
             count = 1;
-            %plotdata(trace);
+            plotdata(trace, 1);
         elseif (val == -4) % End camera2 tx
             count = 1;
             plotdata(trace, 2);
@@ -83,8 +84,11 @@ plot(trace);
 smoothtrace = trace;
 for i = 2:127
     %5-point Averager
-    %INSERT CODE
-end;
+    if (i > 4) && (i < 125)
+        smoothtrace(i)= round((trace(i) + trace(i+1) + trace(i+2) + trace(i-2) + trace(i-1))/5);
+    end
+end
+
 subplot(4,2,cam+2);
 %figure(smoothhand);
 plot(smoothtrace);
