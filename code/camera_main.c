@@ -164,7 +164,7 @@ void PIT0_IRQHandler(void){
 	PIT_TFLG0 |= PIT_TFLG_TIF_MASK; // NOTE - channel 0
 	
 	// Setting mod resets the FTM counter
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us // TODO - change this to be divided by 2 like the init code??
 	
 	// Enable FTM2 interrupts (camera)
 	FTM2_SC |= FTM_SC_TOIE_MASK;
