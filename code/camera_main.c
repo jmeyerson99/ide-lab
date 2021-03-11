@@ -194,7 +194,7 @@ void FTM2_Init(){
 	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000)/2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2; // NOTE: DUTY CYCLE = MOD / 2
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2; // NOTE: DUTY CYCLE = MOD / 2 // TODO - change this to be divided by 4
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 
