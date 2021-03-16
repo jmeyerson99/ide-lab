@@ -20,12 +20,14 @@ int main(void) {
 	// Print welcome over serial
 	UART0_Put("Running... \n\r");
 	
-	//PART 1
+	#define PART_3
+	
+#ifdef PART_1
 	// Generate 20% duty cycle at 10kHz
 	//FTM0_set_duty_cycle(20,10000,1); //20% duty cycle, 10kHz, forward direction
 	//for(;;) ;  //then loop forever
 	
-	
+#elsif PART_2
 	//PART 2
 	for(;;)  //loop forever
 	{
@@ -65,6 +67,39 @@ int main(void) {
 			delay(10);
 		}
 	}
+	
+#else
+	// Enable clocks on Port D.
+	SIM_SCGC5 = SIM_SCGC5_PORTD_MASK;
+	// Configure the Signal Multiplexer for the LEDs
+	PORTD_PCR0 = PORT_PCR_MUX(1);
+	PORTD_PCR1 = PORT_PCR_MUX(1);
+	PORTD_PCR2 = PORT_PCR_MUX(1);
+	PORTD_PCR3 = PORT_PCR_MUX(1);
+	// Configure the GPIO Pins for Output.
+	GPIOD_PDDR |= ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 3));
+	int phase = 0;
+	int forward = 1;
+	while(1) {
+		//Turn off all coils, Set the GPIO pins to 0.
+		GPIOD_PCOR = 0x0F;
+		
+		// set one pin high at a time
+		if(forward){
+			if(phase == 0){GPIOD_PSOR = (1 << 0); phase++;} //A, 1a
+			else if(phase == 1){GPIOD_PSOR = (1 << 1); phase++;} //B, 2b
+			else if(phase == 2){GPIOD_PSOR = (1 << 2); phase++;} //C, 1b
+			else{GPIOD_PSOR = (1 << 3); phase = 0;} //D, 2b
+		}
+		else{ //reverse
+		if(phase == 0){GPIOD_PSOR = (1 << 3); phase++;} //D, 2b
+			else if(phase == 1){GPIOD_PSOR = (1 << 2); phase++;} //C, 1b
+			else if(phase == 2){GPIOD_PSOR = (1 << 1); phase++;} //B, 2a
+			else{GPIOD_PSOR = (1 << 0); phase = 0;} //A, 1a
+		}
+		delay(10);
+	}
+#endif
 }
 
 
@@ -80,33 +115,3 @@ void delay(int del){
 	}
 }
 
-/*
-// Enable clocks on Port D
-
-// Configure the Signal Multiplexer for the Port D GPIO Pins
-
-// Configure the GPIO Pins for Output
-
-int forward = 1;
-int phase = 0;
-
-while(true){
-	// turn off all coils, Set GPIO pins to 0
-
-	// set one pin high at a time
-	if(forward){
-		if(phase == 0){//turn on coil A; phase++;} //A, 1a
-		else if(phase == 1){//turn on coil B; phase++;} //B, 2b
-		else if(phase == 2){//turn on coil C; phase++;} //C, 1b
-		else{//turn on coil D; phase = 0;} //D, 2b
-	}
-	else{ //reverse
-	if(phase == 0){//turn on coil D; phase++;} //D, 2b
-		else if(phase == 1){//turn on coil C; phase++;} //C, 1b
-		else if(phase == 2){//turn on coil B; phase++;} //B, 2a
-		else{//turn on coil A; phase = 0;} //A, 1a
-	}
-	//NOTE: you need to write your own delay function??
-	delay(10);
-}
-*/
