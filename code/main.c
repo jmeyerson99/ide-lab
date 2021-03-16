@@ -16,18 +16,32 @@ int main(void) {
 	// Initialize UART and PWM
 	UART0_Init();
 	FTM0_PWM_Init();
+	FTM3_PWM_Init();
+
 
 	// Print welcome over serial
 	UART0_Put("Running... \n\r");
 	
-	#define PART_3
+	#define PART_1
 	
 #ifdef PART_1
 	// Generate 20% duty cycle at 10kHz
 	//FTM0_set_duty_cycle(20,10000,1); //20% duty cycle, 10kHz, forward direction
 	//for(;;) ;  //then loop forever
 	
-#elsif PART_2
+	//TODO: this is for the servo motor in step 15
+	for(;;){  //then loop forever
+		FTM3_set_duty_cycle(6.6);
+		//delay(5);
+		//FTM3_set_duty_cycle(8.3);
+		//delay(5);
+		//FTM3_set_duty_cycle(6.6);
+		//delay(5);
+		//FTM3_set_duty_cycle(4.9);
+		//delay(5);
+	}
+	
+#elif PART_2
 	//PART 2
 	for(;;)  //loop forever
 	{
@@ -89,15 +103,15 @@ int main(void) {
 			if(phase == 0){GPIOD_PSOR = (1 << 0); phase++;} //A, 1a
 			else if(phase == 1){GPIOD_PSOR = (1 << 1); phase++;} //B, 2b
 			else if(phase == 2){GPIOD_PSOR = (1 << 2); phase++;} //C, 1b
-			else{GPIOD_PSOR = (1 << 3); phase = 0;} //D, 2b
+			else{GPIOD_PSOR = (1 << 3); phase = 0; forward = 0;} //D, 2b
 		}
 		else{ //reverse
 		if(phase == 0){GPIOD_PSOR = (1 << 3); phase++;} //D, 2b
 			else if(phase == 1){GPIOD_PSOR = (1 << 2); phase++;} //C, 1b
 			else if(phase == 2){GPIOD_PSOR = (1 << 1); phase++;} //B, 2a
-			else{GPIOD_PSOR = (1 << 0); phase = 0;} //A, 1a
+			else{GPIOD_PSOR = (1 << 0); phase = 0; forward = 1;} //A, 1a
 		}
-		delay(10);
+		delay(2);
 	}
 #endif
 }
@@ -114,4 +128,3 @@ void delay(int del){
 		// Do nothing
 	}
 }
-
