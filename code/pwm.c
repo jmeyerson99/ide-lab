@@ -31,11 +31,15 @@ void FTM0_set_duty_cycle(unsigned int duty_cycle, unsigned int frequency, int di
   
 	// Set outputs 
 	if(dir) {
-	    FTM0_C3V = mod; 
+	    FTM0_C3V = 0; 
 	    FTM0_C2V = 0;
+			FTM0_C0V = mod; 
+	    FTM0_C1V = mod;
 	} else {
 	    FTM0_C2V = mod; 
-	    FTM0_C3V = 0;
+	    FTM0_C3V = mod;
+			FTM0_C0V = 0; 
+	    FTM0_C1V = 0;
 	}
 
 	// Update the clock to the new frequency
@@ -71,6 +75,8 @@ void FTM0_PWM_Init()
 	
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
+		PORTC_PCR1 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch0
+    PORTC_PCR2 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch1
     PORTC_PCR3 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch2
     PORTC_PCR4 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch3
 	
@@ -97,11 +103,23 @@ void FTM0_PWM_Init()
 	FTM0_C2SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C2SC &= ~FTM_CnSC_ELSA_MASK;
 	
+	// 39.3.6 Set the Status and Control of both channels
+	// Used to configure mode, edge and level selection
+	// See Table 39-67,  Edge-aligned PWM, High-true pulses (clear out on match)
+	FTM0_C0SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
+	FTM0_C0SC &= ~FTM_CnSC_ELSA_MASK;
+	
+	// See Table 39-67,  Edge-aligned PWM, Low-true pulses (clear out on match)
+	FTM0_C1SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
+	FTM0_C1SC &= ~FTM_CnSC_ELSA_MASK;
+	
 	// 39.3.3 FTM Setup
 	// Set prescale value to 1 
 	// Chose system clock source
 	// Timer Overflow Interrupt Enable
-	FTM0_SC = FTM_SC_PS(0) | FTM_SC_CLKS(1); 
+	FTM0_SC = FTM_SC_PS(0) | FTM_SC_CLKS(1) | FTM_SC_TOIE_MASK; 
+	
+	
 }
 
 void FTM3_PWM_Init()
@@ -149,4 +167,22 @@ void FTM3_IRQHandler()
 {
 	FTM3_SC &= ~FTM_SC_TOF_MASK;
 }
+
+void EN_init()
+{
+		//enable port B clock
+		SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
+	
+		//alt1 for PTB2 and PTB3
+	  PORTB_PCR2 = PORT_PCR_MUX(1);
+		PORTB_PCR3 = PORT_PCR_MUX(1);
+	
+		//set pins as outputs
+		GPIOB_PDDR = (1 << 2) | (1 << 3);
+	
+		//turn on enables for both motors
+		GPIOB_PSOR = (1 << 2) | (1 << 3); //TODO: move later for carpet detection
+	
+}
+
 

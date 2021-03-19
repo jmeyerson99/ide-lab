@@ -14,22 +14,33 @@ void delay(int del);
 
 int main(void) {
 	// Initialize UART and PWM
-	UART0_Init();
+	EN_init();
 	FTM0_PWM_Init();
 	FTM3_PWM_Init();
-
-
-	// Print welcome over serial
-	UART0_Put("Running... \n\r");
 	
-	#define PART_3
+	#define PART_1
 	
 #ifdef PART_1
-	// Generate 20% duty cycle at 10kHz
-	FTM0_set_duty_cycle(20,10000,1); //20% duty cycle, 10kHz, forward direction
-	for(;;) ;  //then loop forever
+	// Generate 60% duty cycle at 10kHz
+	FTM0_set_duty_cycle(60,10000,1); //60% duty cycle, 10kHz, forward direction
+	delay(100);
+	FTM0_set_duty_cycle(60,10000,0); //60% duty cycle, 10kHz, forward direction
+
+	//for(;;) ;  //then loop forever
 	
-#elifdef PART_2
+	//TODO: this is for the servo motor in step 15
+	for(;;){  //then loop forever
+		FTM3_set_duty_cycle(6.6);
+		delay(5);
+		FTM3_set_duty_cycle(8.3);
+		delay(5);
+		FTM3_set_duty_cycle(6.6);
+		delay(5);
+		FTM3_set_duty_cycle(4.9);
+		delay(5);
+	}
+	
+#elif PART_2
 	//PART 2
 	for(;;)  //loop forever
 	{
