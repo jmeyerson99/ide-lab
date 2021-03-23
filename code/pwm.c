@@ -12,33 +12,72 @@
 
 /*From clock setup 0 in system_MK64f12.c*/
 #define DEFAULT_SYSTEM_CLOCK    20485760u 
-#define FTM0_MOD_VALUE          (DEFAULT_SYSTEM_CLOCK/10000)
-#define FTM3_MOD_VALUE          ((DEFAULT_SYSTEM_CLOCK/50/128) - 1) //NOTE: 50Hz
+#define SERVO_FREQUENCY         50u    // 50 Hz
+#define DC_MOTOR_FREQUENCY      10000u // 10 kHz
+#define FTM0_MOD_VALUE          (DEFAULT_SYSTEM_CLOCK/DC_MOTOR_FREQUENCY)
+#define FTM3_MOD_VALUE          ((DEFAULT_SYSTEM_CLOCK/SERVO_FREQUENCY/128) - 1) //NOTE: 50Hz
 
+#define SERVO_CENTER_DUTY_CYCLE 6.6 // 6.6% duty cycle centers the steering
+#define SERVO_LEFT_MAX          4.9 // 4.9% duty cycle is a hard left
+#define SERVO_RIGHT_MAX         8.3 // 8.3% duty cycle is a hard right
 
+/* 
+ * Initialize PWM for the DC Motors
+ */
+void PWM_Init() {
+	FTM0_PWM_Init();
+}
+
+/* 
+ * Initialize PWM for the Servo Motor
+ */
+void Servo_Init() {
+	FTM3_PWM_Init();
+}
+
+/* 
+ * Set the speed and direction of the left rear motor
+ */
+void Spin_Left_Motor(unsigned int duty_cycle, DC_Motor_Direction dir) {
+	FTM0_Set_Duty_Cycle(duty_cycle, dir); // TODO - copy paste FTM0_Set_Duty_Cycle and just do the left motor
+}
+
+/* 
+ * Set the speed and direction of the right rear motor
+ */
+void Spin_Right_Motor(unsigned int duty_cycle, DC_Motor_Direction dir) {
+	FTM0_Set_Duty_Cycle(duty_cycle, dir); // TODO - copy paste FTM0_Set_Duty_Cycle and just do the right motor
+}
+
+/* 
+ * Set the direction of the servo motor
+ */
+void Set_Servo_Position(double duty_cycle) {
+	FTM3_Set_Duty_Cycle(duty_cycle);
+}
 
 /*
- * Change the motor duty cycle and frequency
+ * Change the DC motor duty cycle and frequency
  *
  * @param duty_cycle (0 to 100)
  * @param frequency (~1000 Hz to 20000 Hz)
  * @param dir: 1 for pin C4 active, else pin C3 active 
  */
-void FTM0_set_duty_cycle(unsigned int duty_cycle, unsigned int frequency, int dir)
+void FTM0_Set_Duty_Cycle(unsigned int duty_cycle, DC_Motor_Direction dir)
 {
 	// Calculate the new cutoff value
-	uint16_t mod = (uint16_t) (((DEFAULT_SYSTEM_CLOCK / frequency) * duty_cycle) / 100);
+	uint16_t mod = (uint16_t) (((FTM0_MOD_VALUE) * duty_cycle) / 100);
   
-	// Set outputs 
-	if(dir) {
+	// Set outputs - pairs are C2/C0 and C3/C1
+	if (FORWARD == dir) {
 	    FTM0_C3V = 0; 
 	    FTM0_C2V = 0;
-			FTM0_C0V = mod; 
+		FTM0_C0V = mod; 
 	    FTM0_C1V = mod;
 	} else {
 	    FTM0_C2V = mod; 
 	    FTM0_C3V = mod;
-			FTM0_C0V = 0; 
+		FTM0_C0V = 0; 
 	    FTM0_C1V = 0;
 	}
 
@@ -47,13 +86,11 @@ void FTM0_set_duty_cycle(unsigned int duty_cycle, unsigned int frequency, int di
 }
 
 /*
- * Change the motor duty cycle and frequency
+ * Change the servo duty cycle. The frequency is fixed at 50 Hz
  *
  * @param duty_cycle (0 to 100)
- * @param frequency (~1000 Hz to 20000 Hz)
- * @param dir: 1 for pin C4 active, else pin C3 active 
  */
-void FTM3_set_duty_cycle(float duty_cycle)
+void FTM3_Set_Duty_Cycle(double duty_cycle)
 {
 	// Calculate the new cutoff value
 	uint16_t mod = (uint16_t) (((FTM3_MOD_VALUE) * duty_cycle) / 100);
@@ -75,7 +112,7 @@ void FTM0_PWM_Init()
 	
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
-		PORTC_PCR1 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch0
+	PORTC_PCR1 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch0
     PORTC_PCR2 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch1
     PORTC_PCR3 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch2
     PORTC_PCR4 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK; //Ch3
@@ -118,12 +155,9 @@ void FTM0_PWM_Init()
 	// Chose system clock source
 	// Timer Overflow Interrupt Enable
 	FTM0_SC = FTM_SC_PS(0) | FTM_SC_CLKS(1) | FTM_SC_TOIE_MASK; 
-	
-	
 }
 
-void FTM3_PWM_Init()
-{
+void FTM3_PWM_Init() {
 	// 12.2.13 Enable the clock to the FTM3 Module
 	SIM_SCGC3 |= SIM_SCGC3_FTM3_MASK;
 	
@@ -132,7 +166,7 @@ void FTM3_PWM_Init()
 	
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
-  PORTC_PCR8 = PORT_PCR_MUX(3) | PORT_PCR_DSE_MASK; //enables channel 4 for PTC8
+	PORTC_PCR8 = PORT_PCR_MUX(3) | PORT_PCR_DSE_MASK; //enables channel 4 for PTC8
 	
 	// 39.3.10 Disable Write Protection
 	FTM3_MODE |= FTM_MODE_WPDIS_MASK;
@@ -163,26 +197,21 @@ void FTM3_PWM_Init()
 	NVIC_EnableIRQ(FTM3_IRQn);
 }
 
-void FTM3_IRQHandler()
-{
+void FTM3_IRQHandler() {
 	FTM3_SC &= ~FTM_SC_TOF_MASK;
 }
 
-void EN_init()
-{
-		//enable port B clock
-		SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
-	
-		//alt1 for PTB2 and PTB3
-	  PORTB_PCR2 = PORT_PCR_MUX(1);
-		PORTB_PCR3 = PORT_PCR_MUX(1);
-	
-		//set pins as outputs
-		GPIOB_PDDR = (1 << 2) | (1 << 3);
-	
-		//turn on enables for both motors
-		GPIOB_PSOR = (1 << 2) | (1 << 3); //TODO: move later for carpet detection
-	
+void EN_init() {
+	//enable port B clock
+	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
+
+	//alt1 for PTB2 and PTB3
+	PORTB_PCR2 = PORT_PCR_MUX(1);
+	PORTB_PCR3 = PORT_PCR_MUX(1);
+
+	//set pins as outputs
+	GPIOB_PDDR = (1 << 2) | (1 << 3);
+
+	//turn on enables for both motors
+	GPIOB_PSOR = (1 << 2) | (1 << 3); //TODO: move later for carpet detection	
 }
-
-

@@ -1,7 +1,7 @@
 /*
 Title: led.h
 Purpose: On-board LED interface
-Name: Jacob Meyerson
+Authors: Jacob Meyerson & Charlie Poliwoda
 Date: 1/29/21
 */
 // NOTE: The LEDs on the K64 are all active LOW
@@ -10,6 +10,7 @@ Date: 1/29/21
 
 #include "MK64F12.h"                    // Device header
 
+// Function prototypes
 void LED_Off(void);
 void LED_Init(void);
 void LED_On(unsigned char color);
