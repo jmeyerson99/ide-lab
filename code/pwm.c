@@ -31,15 +31,19 @@ void FTM0_set_duty_cycle(unsigned int duty_cycle, unsigned int frequency, int di
   
 	// Set outputs 
 	if(dir) {
-	    FTM0_C3V = 0; 
-	    FTM0_C2V = 0;
+			//left wheel
 			FTM0_C0V = mod; 
-	    FTM0_C1V = mod;
+	    FTM0_C1V = 0; 
+			//right wheel
+	    //FTM0_C2V = mod;
+			//FTM0_C3V = 0;
 	} else {
-	    FTM0_C2V = mod; 
-	    FTM0_C3V = mod;
+			//left wheel
 			FTM0_C0V = 0; 
-	    FTM0_C1V = 0;
+	    FTM0_C1V = mod;
+			//right wheel
+			//FTM0_C2V = 0; 
+	    //FTM0_C3V = mod;
 	}
 
 	// Update the clock to the new frequency
