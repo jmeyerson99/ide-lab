@@ -63,6 +63,10 @@ static int pixcnt = -2;
 static int clkval = 0;
 // line stores the current array of camera data
 static uint16_t line[128];
+static uint16_t smoothline[128];
+static uint16_t binline[128];
+
+
 
 // These variables are for streaming the camera data over UART
 static int capcnt = 0;

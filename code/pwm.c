@@ -39,50 +39,44 @@ void Servo_Init() {
  * Set the speed and direction of the left rear motor
  */
 void Spin_Left_Motor(unsigned int duty_cycle, DC_Motor_Direction dir) {
-	FTM0_Set_Duty_Cycle(duty_cycle, dir); // TODO - copy paste FTM0_Set_Duty_Cycle and just do the left motor
+	// Calculate the new cutoff value
+	uint16_t mod = (uint16_t) (((FTM0_MOD_VALUE) * duty_cycle) / 100);
+  
+	// Set outputs - pairs are C2/C0 and C3/C1
+	if(FORWARD == dir) {
+		//left wheel
+		FTM0_C0V = mod; 
+	  FTM0_C1V = 0; 
+	} else {
+		//left wheel
+		FTM0_C0V = 0; 
+	  FTM0_C1V = mod;
+	}
+
+	// Update the clock to the new frequency
+	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK / DC_MOTOR_FREQUENCY);
 }
 
 /* 
  * Set the speed and direction of the right rear motor
  */
 void Spin_Right_Motor(unsigned int duty_cycle, DC_Motor_Direction dir) {
-	FTM0_Set_Duty_Cycle(duty_cycle, dir); // TODO - copy paste FTM0_Set_Duty_Cycle and just do the right motor
-}
-
-/* 
- * Set the direction of the servo motor
- */
-void Set_Servo_Position(double duty_cycle) {
-	FTM3_Set_Duty_Cycle(duty_cycle);
-}
-
-/*
- * Change the DC motor duty cycle and frequency
- *
- * @param duty_cycle (0 to 100)
- * @param frequency (~1000 Hz to 20000 Hz)
- * @param dir: 1 for pin C4 active, else pin C3 active 
- */
-void FTM0_Set_Duty_Cycle(unsigned int duty_cycle, DC_Motor_Direction dir)
-{
 	// Calculate the new cutoff value
 	uint16_t mod = (uint16_t) (((FTM0_MOD_VALUE) * duty_cycle) / 100);
   
-	// Set outputs - pairs are C2/C0 and C3/C1
-	if (FORWARD == dir) {
-	    FTM0_C3V = 0; 
-	    FTM0_C2V = 0;
-		FTM0_C0V = mod; 
-	    FTM0_C1V = mod;
+	// Set output
+	if(FORWARD == dir) { 
+		//right wheel
+	  FTM0_C2V = mod;
+		FTM0_C3V = 0;
 	} else {
-	    FTM0_C2V = mod; 
-	    FTM0_C3V = mod;
-		FTM0_C0V = 0; 
-	    FTM0_C1V = 0;
+		//right wheel
+		FTM0_C2V = 0; 
+	  FTM0_C3V = mod;
 	}
 
 	// Update the clock to the new frequency
-	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK / frequency);
+	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK / DC_MOTOR_FREQUENCY);
 }
 
 /*
@@ -90,7 +84,7 @@ void FTM0_Set_Duty_Cycle(unsigned int duty_cycle, DC_Motor_Direction dir)
  *
  * @param duty_cycle (0 to 100)
  */
-void FTM3_Set_Duty_Cycle(double duty_cycle)
+void Set_Servo_Position(double duty_cycle)
 {
 	// Calculate the new cutoff value
 	uint16_t mod = (uint16_t) (((FTM3_MOD_VALUE) * duty_cycle) / 100);
@@ -210,8 +204,8 @@ void EN_init() {
 	PORTB_PCR3 = PORT_PCR_MUX(1);
 
 	//set pins as outputs
-	GPIOB_PDDR = (1 << 2) | (1 << 3);
+	GPIOB_PDDR |= (1 << 2) | (1 << 3);
 
 	//turn on enables for both motors
-	GPIOB_PSOR = (1 << 2) | (1 << 3); //TODO: move later for carpet detection	
+	GPIOB_PSOR |= (1 << 2) | (1 << 3); //TODO: move later for carpet detection	
 }

@@ -25,7 +25,7 @@
 #include "camera.h"
 
 void Camera_Init() {
-    GPIO_Init(); // For CLK and SI output on GPIO
+  GPIO_Init(); // For CLK and SI output on GPIO
 	FTM2_Init(); // To generate CLK, SI, and trigger ADC
 	ADC0_Init();
 	PIT_Init();	// To trigger camera read based on integration time
@@ -40,7 +40,7 @@ void Debug_Camera() {
         // send the array over uart
         sprintf(str,"%i\n\r",-1); // start value
         UART0_Put(str);
-        for (i = 0; i < 127; i++) {
+        for (int i = 0; i < 127; i++) {
             sprintf(str,"%i\n\r", line[i]);
             UART0_Put(str);
         }
@@ -49,10 +49,9 @@ void Debug_Camera() {
         capcnt = 0;
         GPIOB_PSOR |= (1 << 22);
     }
-}
-	
+}	
 #endif /* DEBUG_CAM */
-}
+
 
 /* ADC0 Conversion Complete ISR  */
 void ADC0_IRQHandler() {
@@ -111,12 +110,12 @@ void FTM2_IRQHandler(){ // For FTM timer
 *		always counting, I am just enabling/disabling FTM2 
 *		interrupts to control when the line capture occurs
 */
-void PIT0_IRQHandler(){
-	if (debugcamdata) {
-		// Increment capture counter so that we can only 
-		//	send line data once every ~2 seconds
-		capcnt += 1;
-	}
+void PIT0_IRQHandler() {
+#ifdef DEBUG_CAM
+	// Increment capture counter so that we can only 
+	//	send line data once every ~2 seconds
+	capcnt += 1;
+#endif /* DEBUG_CAM */
 	// Clear interrupt by writing a 1 to TIF bit
 	PIT_TFLG0 |= PIT_TFLG_TIF_MASK; // NOTE - channel 0
 	
@@ -151,7 +150,7 @@ void FTM2_Init(){
 	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000)/2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2; // NOTE: DUTY CYCLE = MOD / 2 // TODO - change this to be divided by 4
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/4; // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 
@@ -233,6 +232,7 @@ void GPIO_Init(void){
 	// Initialize PTB9 as an output (camera clock)
 	PORTB_PCR9 = PORT_PCR_MUX(1);
 	GPIOB_PDDR |= (1 << 9);
+	
 	// Initialize PTB23 as an output (camera SI)
 	PORTB_PCR23 = PORT_PCR_MUX(1);
 	GPIOB_PDDR |= (1 << 23);
