@@ -20,7 +20,8 @@ function plot_cameras_serial
 
 delete(instrfindall);
 %Send over bluetooth or serial
-serialPort = 'COM4';
+%serialPort = 'COM4'; % windows
+serialPort = '/dev/tty.usbmodem14402'; % mac
 serialObject = serial(serialPort);
 %configure serial connection
 serialObject.BaudRate = 9600; %(Default)
