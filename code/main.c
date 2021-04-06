@@ -27,8 +27,18 @@ void Car_Init() {
 		EN_init();		 // for motor enable
 }
 
+void Spin_Stuff() {
+  while (1) {
+    Spin_Left_Motor(30,FORWARD);
+		Spin_Right_Motor(30,FORWARD);
+  }
+
+}
+
 int main(void) {
     Car_Init();
+
+    Spin_Stuff(); // DEBUG
 
     // TODO - loop forever until a switch gets pressed to start running
 		
@@ -72,16 +82,22 @@ int main(void) {
       }
 
       int ajdusted_mdpt = (left_side_change_index + right_side_change_index) / 2;
+      
+      // if adjusted_mdpt = 0, STOP
+      if (0 == ajdusted_mdpt) {car_mode = STOP;} 
 
       // determine turning offsets based on the midpoint of left and right side change index
+      double turn_percentage = 0.0;
       if (ajdusted_mdpt > 64) {
+        turn_percentage = (ajdusted_mdpt - 64) / 64;
+        car_mode = TURN_LEFT;
         // turn left
       }
       if (ajdusted_mdpt < 64) {
+        turn_percentage = (64 - ajdusted_mdpt) / 64;
+        car_mode = TURN_RIGHT;
         // turn right
       }
-
-      double mdpt_shift_percentage = (ajdusted_mdpt - 64) / 64;
 
       // create an enum for car states based on the line data 
       // use a switch statement to control car logic
@@ -89,12 +105,20 @@ int main(void) {
           case ACCELERATE:
 
           case STRAIGHT:
+            Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
+            Spin_Left_Motor(35,FORWARD);
+		        Spin_Right_Motor(35,FORWARD);
+            break;
 
           case STOP:
 
           case TURN_LEFT:
+            Set_Servo_Position(SERVO_LEFT_MAX * turn_percentage); // TODO - this might be wrong
+            break;
 
           case TURN_RIGHT:
+            Set_Servo_Position(SERVO_RIGHT_MAX * turn_percentage); // TODO - this might be wrong
+            break;
 
       }
 
