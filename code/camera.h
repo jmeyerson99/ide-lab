@@ -49,7 +49,7 @@ void FTM2_IRQHandler(void);
 void PIT0_IRQHandler(void);
 void ADC0_IRQHandler(void);
 
-int Get_Line(uint16_t* data);
+void Get_Line(uint16_t* data);
 
 void Camera_Init(void);
 

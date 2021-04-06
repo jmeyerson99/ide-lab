@@ -10,6 +10,8 @@ Date: 3/23/21
 #include "uart.h"
 #include "pwm.h"
 
+//#define VERBOSE
+
 // Function prototypes
 void Car_Init(void);
 
@@ -35,6 +37,10 @@ void Car_Init() {
 
 int main(void) {
     Car_Init();
+	
+	  Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
+	  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
+		Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
 
     // TODO - loop forever until a switch gets pressed to start running
 		
@@ -46,12 +52,10 @@ int main(void) {
 #endif /* DEBUG_CAM */
 			
 			// Get a line from the camera
-			while (1) {
-				if(Get_Line(line_data)) {break;}
-			}
-			UART0_Put("Do I ever get here?"); // DEBUG
+			Get_Line(line_data);
+	
       // process the line here - create binary plot
-      double line_avg = 0;
+      int line_avg = 0;
       // smooth out the line using 5 point averager (edge cases, then loop)
       smoothline[0] = (line_data[0] + line_data[1] + line_data[2])/3;
       smoothline[1] = (line_data[1] + line_data[1] + line_data[2] + line_data[0])/4;
@@ -62,44 +66,72 @@ int main(void) {
           smoothline[i] = (line_data[i] + line_data[i+1] + line_data[i+2] + line_data[i-1] + line_data[i-2])/5;
         }
         line_avg = line_avg + line_data[i];
-				UART0_Put("Line_data["); UART0_PutNumU(i); UART0_Put("] = "); UART0_PutNumU(line_data[64]); UART0_Put("\r\n"); // DEBUG
+#ifdef VERBOSE
+				//UART3_Put("line["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(line_data[i]); UART3_Put("\r\n"); // DEBUG
+#endif
       }
       line_avg = line_avg/128;
+#ifdef VERBOSE
+				UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
+#endif
 
       // use smoothline to make binary plot
       for(int i = 0; i < 128; i++){
-        binline[i] = line_avg < smoothline[i] ? 1 : 0;
+        //binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - MAKE THIS WORK
+				binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
+#ifdef VERBOSE
+				//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
+#endif
       }
       // find the switching indices
       int left_side_change_index = 0;
       int right_side_change_index = 0;
       for (int i = 1; i < 128; i++) {
-        if (line_data[i-1] == 0 && line_data[i] == 1) {right_side_change_index = i;break;}
+        if (binline[i-1] == 0 && binline[i] == 1) {left_side_change_index = i;break;}
       }
-      for (int i = 127; i < 1; i--) {
-        if (line_data[i] == 1 && line_data[i+1] == 0) {left_side_change_index = i;break;}
+      for (int i = 127; i > 1; i--) {
+        if (binline[i] == 0 && binline[i-1] == 1) {right_side_change_index = i;break;}
       }
 
-      int ajdusted_mdpt = (left_side_change_index + right_side_change_index) / 2;
-      
-      // if adjusted_mdpt = 0, STOP
-      if (0 == ajdusted_mdpt) {car_mode = STOP;} 
+      int adjusted_mdpt = (left_side_change_index + right_side_change_index) / 2;
 
+#ifdef VERBOSE
+			UART3_Put("left edge= "); UART3_PutNumU(left_side_change_index); UART3_Put("\r\n"); // DEBUG
+			UART3_Put("right edge= "); UART3_PutNumU(right_side_change_index); UART3_Put("\r\n"); // DEBUG
+			UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
+#endif
       // determine turning offsets based on the midpoint of left and right side change index
       double turn_percentage = 0.0;
-      if (ajdusted_mdpt > 64) {
-        turn_percentage = (ajdusted_mdpt - 64) / 64;
+      if (0 == adjusted_mdpt) { // if adjusted_mdpt = 0, STOP
+				car_mode = STOP;
+#ifdef VERBOSE
+				UART3_Put(" STOP \r\n"); // DEBUG
+#endif
+			} 
+			else if (adjusted_mdpt > (64-8) && adjusted_mdpt < (64+8)) { // go straight
+				car_mode = STRAIGHT;
+#ifdef VERBOSE
+				UART3_Put(" CONTINUE \r\n"); // DEBUG
+#endif
+			}
+      else if (adjusted_mdpt > 64) { // turn left
+        turn_percentage = (adjusted_mdpt - (64-8)) / (64-8);
         car_mode = TURN_LEFT;
-        // turn left
+#ifdef VERBOSE
+				UART3_Put(" TURN LEFT \r\n"); // DEBUG
+#endif
       }
-      if (ajdusted_mdpt < 64) {
-        turn_percentage = (64 - ajdusted_mdpt) / 64;
+      else if (adjusted_mdpt < 64) { // turn right
+        turn_percentage = ((64-8) - adjusted_mdpt) / (64-8);
         car_mode = TURN_RIGHT;
-        // turn right
+#ifdef VERBOSE
+				UART3_Put(" TURN RIGHT \r\n"); // DEBUG
+#endif
       }
-
+			
       // create an enum for car states based on the line data 
       // use a switch statement to control car logic
+			double servo_duty;
       switch (car_mode) {
           case ACCELERATE:
 
@@ -115,13 +147,27 @@ int main(void) {
 						break;
 
           case TURN_LEFT:
-            Set_Servo_Position(SERVO_LEFT_MAX * turn_percentage); // TODO - this might be wrong
+						servo_duty = SERVO_CENTER_DUTY_CYCLE - ((SERVO_CENTER_DUTY_CYCLE - SERVO_LEFT_MAX) * turn_percentage);
+#ifdef VERBOSE
+			char str[256]; // used later
+			sprintf(str,"%lf\n\r",servo_duty);
+			UART3_Put(str); // DEBUG
+#endif
+            Set_Servo_Position(SERVO_LEFT_MAX); // TODO - scaling doesn't work!!
+					  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
+		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
             break;
 
           case TURN_RIGHT:
-            Set_Servo_Position(SERVO_RIGHT_MAX * turn_percentage); // TODO - this might be wrong
+						servo_duty = ((SERVO_RIGHT_MAX - SERVO_CENTER_DUTY_CYCLE) * turn_percentage) + SERVO_CENTER_DUTY_CYCLE;
+#ifdef VERBOSE 
+			sprintf(str,"%lf\n\r",servo_duty);
+			UART3_Put(str); // DEBUG
+#endif
+            Set_Servo_Position(SERVO_RIGHT_MAX); // TODO - scaling doesn't work!!
+						Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
+		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
             break;
       }
-
     }
 }

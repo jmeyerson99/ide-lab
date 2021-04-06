@@ -52,8 +52,8 @@ void Camera_Init() {
 	PIT_Init();	// To trigger camera read based on integration time
 }
 
-int Get_Line(uint16_t* data) { 
-	/* //Find alternative for commented out block
+void Get_Line(uint16_t* data) { 
+	//Find alternative for top block 
 	while (1) {
 		NVIC_DisableIRQ(FTM2_IRQn);
 		if (TRUE == line_ready) {break;}
@@ -63,17 +63,13 @@ int Get_Line(uint16_t* data) {
 		data[i] = line[i];
 	}
 	NVIC_EnableIRQ(FTM2_IRQn);
-	line_ready = FALSE;
-	*/
-	if (TRUE == line_ready) {
-		for (int i = 0; i < 128; i++) {
-			data[i] = line[i];
-		}
-		line_ready = FALSE;
-		return 1;
+	line_ready = FALSE; 
+	/*
+	while (line_ready == FALSE) {}
+	for (int i = 0; i < 128; i++) {
+		data[i] = line[i];
 	}
-	line_ready = FALSE;
-	return 0;
+	line_ready = FALSE;  */
 }
 
 #ifdef DEBUG_CAM
@@ -142,7 +138,7 @@ void FTM2_IRQHandler(){ // For FTM timer
 		GPIOB_PCOR |= (1 << 9); // CLK = 0
 		clkval = 0; // make sure clock variable = 0
 		pixcnt = -2; // reset counter
-		line_ready = TRUE; // indicate the camera has completed a line scan
+		line_ready = TRUE; // indicate the camera has completed a line scan 
 		// Disable FTM2 interrupts (until PIT0 overflows
 		//   again and triggers another line capture)
 		FTM2_SC &= ~FTM_SC_TOIE_MASK;
