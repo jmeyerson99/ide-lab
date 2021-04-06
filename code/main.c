@@ -15,7 +15,12 @@ void Car_Init(void);
 
 // Car drive states
 enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, TURN_LEFT, TURN_RIGHT}; 
-enum DRIVE_MODE car_mode;
+static enum DRIVE_MODE car_mode;
+
+// Local data
+static uint16_t smoothline[128];
+static uint16_t binline[128];
+static uint16_t line_data[128];
 
 void Car_Init() {
     UART0_Init();  // for serial
@@ -27,23 +32,11 @@ void Car_Init() {
 		EN_init();		 // for motor enable
 }
 
-void Spin_Stuff() {
-  while (1) {
-    Spin_Left_Motor(30,FORWARD);
-		Spin_Right_Motor(30,FORWARD);
-  }
-
-}
 
 int main(void) {
     Car_Init();
 
-    Spin_Stuff(); // DEBUG
-
     // TODO - loop forever until a switch gets pressed to start running
-		
-		//Spin_Left_Motor(30,FORWARD);
-		//Spin_Right_Motor(30,FORWARD);
 		
     // Main loop below
     //  Read the camera data, process the line array. Based on that, turn the servo and spin the DC motors
@@ -51,19 +44,25 @@ int main(void) {
 #ifdef DEBUG_CAM
       Debug_Camera();
 #endif /* DEBUG_CAM */
-
+			
+			// Get a line from the camera
+			while (1) {
+				if(Get_Line(line_data)) {break;}
+			}
+			UART0_Put("Do I ever get here?"); // DEBUG
       // process the line here - create binary plot
       double line_avg = 0;
       // smooth out the line using 5 point averager (edge cases, then loop)
-      smoothline[0] = (line[i] + line[i+1] + line[i+2])/3;
-      smoothline[1] = (line[i] + line[i+1] + line[i+2] + line[i-1])/4;
-      smoothline[127] = (line[i] + line[i-1] + line[i-2])/3;
-      smoothline[126] = (line[i] + line[i-1] + line[i-2] + line[i+1])/4;
+      smoothline[0] = (line_data[0] + line_data[1] + line_data[2])/3;
+      smoothline[1] = (line_data[1] + line_data[1] + line_data[2] + line_data[0])/4;
+      smoothline[127] = (line_data[127] + line_data[126] + line_data[125])/3;
+      smoothline[126] = (line_data[126] + line_data[125] + line_data[124] + line_data[127])/4;
       for(int i = 0; i < 128; i++) {
         if(i > 1 && i < 126){
-          smoothline[i] = (line[i] + line[i+1] + line[i+2] + line[i-1] + line[i-2])/5;
+          smoothline[i] = (line_data[i] + line_data[i+1] + line_data[i+2] + line_data[i-1] + line_data[i-2])/5;
         }
-        line_avg = line_avg + line[i];
+        line_avg = line_avg + line_data[i];
+				UART0_Put("Line_data["); UART0_PutNumU(i); UART0_Put("] = "); UART0_PutNumU(line_data[64]); UART0_Put("\r\n"); // DEBUG
       }
       line_avg = line_avg/128;
 
@@ -74,11 +73,11 @@ int main(void) {
       // find the switching indices
       int left_side_change_index = 0;
       int right_side_change_index = 0;
-      for (int i = 1, i < 128, i++) {
-        if (line[i-1] == 0 && line[i] == 1) {right_side_change_index = i;break;}
+      for (int i = 1; i < 128; i++) {
+        if (line_data[i-1] == 0 && line_data[i] == 1) {right_side_change_index = i;break;}
       }
-      for (int i = 127, i < 1, i--) {
-        if (line[i] == 1 && line[i+1] == 0) {left_side_change_index = i;break;}
+      for (int i = 127; i < 1; i--) {
+        if (line_data[i] == 1 && line_data[i+1] == 0) {left_side_change_index = i;break;}
       }
 
       int ajdusted_mdpt = (left_side_change_index + right_side_change_index) / 2;
@@ -106,11 +105,14 @@ int main(void) {
 
           case STRAIGHT:
             Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
-            Spin_Left_Motor(35,FORWARD);
-		        Spin_Right_Motor(35,FORWARD);
+            Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
+		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
             break;
 
           case STOP:
+						Spin_Left_Motor(0,FORWARD);
+		        Spin_Right_Motor(0,FORWARD);
+						break;
 
           case TURN_LEFT:
             Set_Servo_Position(SERVO_LEFT_MAX * turn_percentage); // TODO - this might be wrong
@@ -119,7 +121,6 @@ int main(void) {
           case TURN_RIGHT:
             Set_Servo_Position(SERVO_RIGHT_MAX * turn_percentage); // TODO - this might be wrong
             break;
-
       }
 
     }

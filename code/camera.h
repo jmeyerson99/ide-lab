@@ -39,7 +39,7 @@
 // Must be above 1.25 ms based on camera clk 
 //	(camera clk is the mod value set in FTM2)
 #define INTEGRATION_TIME (2.0f * .0075f) //NOTE: default = .0075 //NOTE: this will change based on light levels??? More light, less time
-#define DEBUG_CAM // define this for when the camera is being debugged (connected to matlab)
+//#define DEBUG_CAM // define this for when the camera is being debugged (connected to matlab)
 
 void FTM2_Init(void);
 void GPIO_Init(void);
@@ -49,30 +49,14 @@ void FTM2_IRQHandler(void);
 void PIT0_IRQHandler(void);
 void ADC0_IRQHandler(void);
 
+int Get_Line(uint16_t* data);
+
 void Camera_Init(void);
+
+typedef enum {FALSE, TRUE} boolean;
 
 #ifdef DEBUG_CAM
 void Debug_Camera(void);
 #endif /* DEBUG_CAM */
-
-// Pixel counter for camera logic
-// Starts at -2 so that the SI pulse occurs
-//		ADC reads start
-static int pixcnt = -2;
-// clkval toggles with each FTM interrupt
-static int clkval = 0;
-// line stores the current array of camera data
-static uint16_t line[128];
-static uint16_t smoothline[128];
-static uint16_t binline[128];
-
-
-
-// These variables are for streaming the camera data over UART
-static int capcnt = 0;
-static char str[100];
-
-// ADC0VAL holds the current ADC value
-static uint16_t ADC0VAL;
 
 #endif /* CAMERA_H */

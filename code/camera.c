@@ -24,11 +24,56 @@
 
 #include "camera.h"
 
+// Local variables
+// Pixel counter for camera logic
+// Starts at -2 so that the SI pulse occurs
+//		ADC reads start
+static int pixcnt = -2;
+// clkval toggles with each FTM interrupt
+static int clkval = 0;
+// line stores the current array of camera data
+static uint16_t line[128];
+
+static boolean line_ready = FALSE;
+
+#ifdef DEBUG_CAMERA
+// These variables are for streaming the camera data over UART
+static int capcnt = 0;
+static char str[100];
+#endif
+
+// ADC0VAL holds the current ADC value
+static uint16_t ADC0VAL;
+
 void Camera_Init() {
   GPIO_Init(); // For CLK and SI output on GPIO
 	FTM2_Init(); // To generate CLK, SI, and trigger ADC
 	ADC0_Init();
 	PIT_Init();	// To trigger camera read based on integration time
+}
+
+int Get_Line(uint16_t* data) { 
+	/* //Find alternative for commented out block
+	while (1) {
+		NVIC_DisableIRQ(FTM2_IRQn);
+		if (TRUE == line_ready) {break;}
+		NVIC_EnableIRQ(FTM2_IRQn);
+	}
+	for (int i = 0; i < 128; i++) {
+		data[i] = line[i];
+	}
+	NVIC_EnableIRQ(FTM2_IRQn);
+	line_ready = FALSE;
+	*/
+	if (TRUE == line_ready) {
+		for (int i = 0; i < 128; i++) {
+			data[i] = line[i];
+		}
+		line_ready = FALSE;
+		return 1;
+	}
+	line_ready = FALSE;
+	return 0;
 }
 
 #ifdef DEBUG_CAM
@@ -97,6 +142,7 @@ void FTM2_IRQHandler(){ // For FTM timer
 		GPIOB_PCOR |= (1 << 9); // CLK = 0
 		clkval = 0; // make sure clock variable = 0
 		pixcnt = -2; // reset counter
+		line_ready = TRUE; // indicate the camera has completed a line scan
 		// Disable FTM2 interrupts (until PIT0 overflows
 		//   again and triggers another line capture)
 		FTM2_SC &= ~FTM_SC_TOIE_MASK;
