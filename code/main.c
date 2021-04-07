@@ -10,19 +10,23 @@ Date: 3/23/21
 #include "uart.h"
 #include "pwm.h"
 
-//#define VERBOSE
+#define VERBOSE
 
 // Function prototypes
 void Car_Init(void);
 
 // Car drive states
-enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, TURN_LEFT, TURN_RIGHT}; 
+enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, TURN_LEFT, TURN_RIGHT, BRAKE}; 
 static enum DRIVE_MODE car_mode;
 
 // Local data
 static uint16_t smoothline[128];
 static uint16_t binline[128];
 static uint16_t line_data[128];
+
+#ifdef VERBOSE
+static char str[256];
+#endif
 
 void Car_Init() {
     UART0_Init();  // for serial
@@ -72,7 +76,7 @@ int main(void) {
       }
       line_avg = line_avg/128;
 #ifdef VERBOSE
-				UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
+				//UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
 #endif
 
       // use smoothline to make binary plot
@@ -96,12 +100,15 @@ int main(void) {
       int adjusted_mdpt = (left_side_change_index + right_side_change_index) / 2;
 
 #ifdef VERBOSE
-			UART3_Put("left edge= "); UART3_PutNumU(left_side_change_index); UART3_Put("\r\n"); // DEBUG
-			UART3_Put("right edge= "); UART3_PutNumU(right_side_change_index); UART3_Put("\r\n"); // DEBUG
+			//UART3_Put("left edge= "); UART3_PutNumU(left_side_change_index); UART3_Put("\r\n"); // DEBUG
+			//UART3_Put("right edge= "); UART3_PutNumU(right_side_change_index); UART3_Put("\r\n"); // DEBUG
 			UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
 #endif
       // determine turning offsets based on the midpoint of left and right side change index
-      double turn_percentage = 0.0;
+      
+#ifdef VERBOSE
+			//UART3_Put("turn_percentage:"); sprintf(str,"%lf\n\r",turn_percentage); UART3_Put(str); // DEBUG
+#endif
       if (0 == adjusted_mdpt) { // if adjusted_mdpt = 0, STOP
 				car_mode = STOP;
 #ifdef VERBOSE
@@ -115,14 +122,12 @@ int main(void) {
 #endif
 			}
       else if (adjusted_mdpt > 64) { // turn left
-        turn_percentage = (adjusted_mdpt - (64-8)) / (64-8);
         car_mode = TURN_LEFT;
 #ifdef VERBOSE
 				UART3_Put(" TURN LEFT \r\n"); // DEBUG
 #endif
       }
       else if (adjusted_mdpt < 64) { // turn right
-        turn_percentage = ((64-8) - adjusted_mdpt) / (64-8);
         car_mode = TURN_RIGHT;
 #ifdef VERBOSE
 				UART3_Put(" TURN RIGHT \r\n"); // DEBUG
@@ -131,8 +136,10 @@ int main(void) {
 			
       // create an enum for car states based on the line data 
       // use a switch statement to control car logic
-			double servo_duty;
+			double turn_percentage = 0.0;
       switch (car_mode) {
+					case BRAKE:
+						
           case ACCELERATE:
 
           case STRAIGHT:
@@ -147,24 +154,17 @@ int main(void) {
 						break;
 
           case TURN_LEFT:
-						servo_duty = SERVO_CENTER_DUTY_CYCLE - ((SERVO_CENTER_DUTY_CYCLE - SERVO_LEFT_MAX) * turn_percentage);
-#ifdef VERBOSE
-			char str[256]; // used later
-			sprintf(str,"%lf\n\r",servo_duty);
-			UART3_Put(str); // DEBUG
-#endif
-            Set_Servo_Position(SERVO_LEFT_MAX); // TODO - scaling doesn't work!!
+						turn_percentage = (SERVO_RIGHT_MAX - SERVO_LEFT_MAX)*((adjusted_mdpt + 48.0)/(128.0 + 48.0))+SERVO_LEFT_MAX;
+						turn_percentage = SERVO_CENTER_DUTY_CYCLE - (turn_percentage - SERVO_CENTER_DUTY_CYCLE); // offset comes out flipped, so swap above/below center duty cycle
+            Set_Servo_Position(turn_percentage); // TODO - scaling doesn't work!!
 					  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
 		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
             break;
 
           case TURN_RIGHT:
-						servo_duty = ((SERVO_RIGHT_MAX - SERVO_CENTER_DUTY_CYCLE) * turn_percentage) + SERVO_CENTER_DUTY_CYCLE;
-#ifdef VERBOSE 
-			sprintf(str,"%lf\n\r",servo_duty);
-			UART3_Put(str); // DEBUG
-#endif
-            Set_Servo_Position(SERVO_RIGHT_MAX); // TODO - scaling doesn't work!!
+						turn_percentage = (SERVO_RIGHT_MAX - SERVO_LEFT_MAX)*((adjusted_mdpt - 48.0)/(128.0 - 48.0))+SERVO_LEFT_MAX;
+						turn_percentage = SERVO_CENTER_DUTY_CYCLE - (turn_percentage - SERVO_CENTER_DUTY_CYCLE); // offset comes out flipped, so swap above/below center duty cycle
+            Set_Servo_Position(turn_percentage); // TODO - scaling doesn't work!!
 						Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
 		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
             break;

@@ -53,7 +53,7 @@ void Camera_Init() {
 }
 
 void Get_Line(uint16_t* data) { 
-	//Find alternative for top block 
+	//Find alternative for top block TODO
 	while (1) {
 		NVIC_DisableIRQ(FTM2_IRQn);
 		if (TRUE == line_ready) {break;}
