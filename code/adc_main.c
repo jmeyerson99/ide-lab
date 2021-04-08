@@ -113,20 +113,18 @@ int main(void) {
 
 	//#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion */
 	for(;;) {
-#ifdef TEMP_SENSOR /* TEMP_SENSOR */
 		// NOTE: Use the following to convert voltage to light
 		// Vcc = 3.3 V 
 		// Resolution = 16 bits
-		// Output voltage scaling = 13.75 mV / BPM
-		// beats = ((3300 mV / (2^16) levels) * ADC) / 13.75 mV
-		double beats = (((3300.0/65536.0) * ADC1_RA)) / 13.75;
-		sprintf(str,"\n vout: %f\n\r", beats);
+		// vout = ((3300 mV / (2^16) levels) * ADC)
+		double vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+		//sprintf(str,"\n vout: %f\n\r", vout);
+		sprintf(str,"%f\n\r", vout);
+
 		UART0_Put(str);
-#else /* TEMP_SENSOR */
-		sprintf(str,"\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
-		UART0_Put(str);
-#endif /* TEMP_SENSOR */
-		for(i = 0; i < 5000000; ++i ){
+		//sprintf(str,"\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
+		//UART0_Put(str);
+		for(i = 0; i < 1500000; ++i ){
 			// Use this for delay in printing results
 		}
 	}
