@@ -1,7 +1,7 @@
 /*
 Title: led.c
 Purpose: On-board LED interface
-Authors: Jacob Meyerson & Charlie Poliwoda
+Name: Jacob Meyerson
 Date: 1/29/21
 */
 

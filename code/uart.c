@@ -162,9 +162,3 @@ void UART0_PutNumU(int i) {
 	sprintf(str, "%u", i);
 	UART0_Put( str);
 }
-
-void UART3_PutNumU(int i) {
-	char str[CHAR_COUNT];
-	sprintf(str, "%u", i);
-	UART3_Put( str);
-}
