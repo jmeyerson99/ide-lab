@@ -12,7 +12,7 @@ Date: 2/26/21
 static int switch_2_cnt = 0;
 static bool switch_2_pressed = FALSE;
 static PDB_State pdb_state = DISABLED;
-
+/*
 void PDB0_IRQHandler(void){ // For PDB timer
 	// Clear the interrupt in register PDB0_SC
 	PDB0_SC &= ~(PDB_SC_PDBIF_MASK);
@@ -66,4 +66,4 @@ void PORTC_IRQHandler(void){ // For switch 2
 		UART0_Put(" milliseconds.\r\n");
 		switch_2_cnt = 0; // reset the counter
 	}
-}
+} */

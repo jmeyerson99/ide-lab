@@ -15,6 +15,18 @@ void PDB_Init(void);
 void ADC1_Init(void);
 void DAC0_Init(void);
 void ADC1_IRQHandler(void);
+void FTM_Init(void);
+void FTM0_IRQHandler(void);
+
+/* From clock setup 0 in system_MK64f12.c */
+#define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
+
+static int cnt = 0;
+static int print_data = 0;
+static int increment_counter = 0; // use this to incrememnt the counter
+static int dropped_below_peak = 0; // use this to know when we are done counting
+static double vout = 0.0;
+static char str[100];
  
 void PDB_Init() {
 	// Enable clock for PDB module
@@ -100,32 +112,88 @@ void DAC0_Init() {
 }
  
 int main(void) {
-	int i = 0; char str[100];
-
 	// Initialize modules
 	UART0_Init();
 	DAC0_Init();
 	ADC1_Init();
 	PDB_Init();
+	FTM_Init();
 
 	// Start the PDB (ADC Conversions)
 	PDB0_SC |= PDB_SC_SWTRIG_MASK;
 
-	//#define TEMP_SENSOR /* Define TEMP_SENSOR to print the temperature conversion */
 	for(;;) {
-		// NOTE: Use the following to convert voltage to light
 		// Vcc = 3.3 V 
 		// Resolution = 16 bits
 		// vout = ((3300 mV / (2^16) levels) * ADC)
-		double vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
-		//sprintf(str,"\n vout: %f\n\r", vout);
-		sprintf(str,"%f\n\r", vout);
-
-		UART0_Put(str);
-		//sprintf(str,"\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
+		// use pin ADC0_DP0
+		vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+		//sprintf(str,"vout = %f\n\r", vout); // print the counter (counter incrememts by 1 every 1 ms)
 		//UART0_Put(str);
-		for(i = 0; i < 1500000; ++i ){
-			// Use this for delay in printing results
+		
+		if (print_data) {
+			increment_counter = 0;
+			sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
+			UART0_Put(str);
+			sprintf(str,"BPM = %d\n\r", ((1000*60)/cnt)); // print the counter (counter incrememts by 1 every 1 ms)
+			UART0_Put(str);
+			cnt = 0;
+			dropped_below_peak = 0;
+			print_data = 0;
 		}
 	}
+}
+
+void FTM0_IRQHandler(void){ // For FTM timer
+	// Clear the interrupt in regster FTM0_SC
+	FTM0_SC &= ~(FTM_SC_TOF_MASK);
+	
+	if (vout >= 3.25 && vout < 3.4 && increment_counter == 0) {
+		increment_counter = 1;
+		//UART0_Put("Found a peak\r\n");
+		dropped_below_peak = 0;
+	}
+	else if (vout < 3.25 && increment_counter == 1 && dropped_below_peak == 0) {
+		dropped_below_peak = 1;
+		//UART0_Put("oyoyoy");
+	}
+	else if (vout >= 3.25 && vout < 3.4 && increment_counter == 1 && dropped_below_peak == 1) {
+		print_data = 1;
+		//UART0_Put("OYOYOY");
+	}
+	if (increment_counter) {
+		//sprintf(str,"Count = %d\n\r", cnt); 
+		//UART0_Put(str);
+		cnt++;
+	}
+	
+}
+
+void FTM_Init(void){
+	// Enable clock for FTM module (use FTM0)
+	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
+
+	// turn off FTM Mode to write protection;
+	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+
+	// divide the input clock down by 128,
+	FTM0_SC |= FTM_SC_PS(7); // 111 = divide by 128
+
+	// reset the counter to zero
+	FTM0_CNT &= ~(FTM_CNT_COUNT_MASK);
+
+	// Set the overflow rate
+	// (Sysclock/128)- clock after prescaler
+	// (Sysclock/128)/1000- slow down by a factor of 1000 to go from
+	// Mhz to Khz, then 1/KHz = msec
+	// Every 1msec, the FTM counter will set the overflow flag (TOF) and
+	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK/(1<<7))/1000;
+
+	// Select the System Clock
+	FTM0_SC |= FTM_SC_CLKS(1); // 1 = system clock
+
+	// Enable the interrupt mask. Timer Overflow Interrupt Enable
+	FTM0_SC |= FTM_SC_TOIE_MASK;
+	
+	NVIC_EnableIRQ(FTM0_IRQn);
 }
