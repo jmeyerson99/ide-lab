@@ -27,7 +27,14 @@ Project File Date:  04/09/2021
 <h2>Output:</h2>
 *** Using Compiler 'V6.15', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
-".\Objects\adc_sensor_part_2.axf" - 0 Error(s), 0 Warning(s).
+compiling adc_main.c...
+../code/adc_main.c(27): warning: unused variable 'dropped_below_peak' [-Wunused-variable]
+static int dropped_below_peak = 0; // use this to know when we are done counting
+           ^
+1 warning generated.
+linking...
+Program Size: Code=11128 RO-data=1604 RW-data=0 ZI-data=1264  
+".\Objects\adc_sensor_part_2.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +62,7 @@ Package Vendor: Keil
    * Component: Keil::Device:Startup:1.0.0
       Source file:   Device\Source\ARM\startup_MK64F12.s
       Source file:   Device\Source\system_MK64F12.c
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

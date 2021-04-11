@@ -26,6 +26,9 @@ static int print_data = 0;
 static int increment_counter = 0; // use this to incrememnt the counter
 static int dropped_below_peak = 0; // use this to know when we are done counting
 static double vout = 0.0;
+static double last_vout = 0.0;
+static int slope = 0;
+static int last_slope = 0;
 static char str[100];
  
 void PDB_Init() {
@@ -127,19 +130,27 @@ int main(void) {
 		// Resolution = 16 bits
 		// vout = ((3300 mV / (2^16) levels) * ADC)
 		// use pin ADC0_DP0
+		last_slope = slope;
+		last_vout = vout;
 		vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 		//sprintf(str,"vout = %f\n\r", vout); // print the counter (counter incrememts by 1 every 1 ms)
 		//UART0_Put(str);
+
+		if (vout - last_vout > 0) {slope = 1;}
+		if (vout - last_vout < 0) {slope = -1;}
+		
+		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
+		//UART0_Put(str);
 		
 		if (print_data) {
-			increment_counter = 0;
 			sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
 			UART0_Put(str);
-			sprintf(str,"BPM = %d\n\r", ((1000*60)/cnt)); // print the counter (counter incrememts by 1 every 1 ms)
-			UART0_Put(str);
+			//sprintf(str,"BPM = %d\n\r", ((1000*60)/cnt)); // print the counter (counter incrememts by 1 every 1 ms)
+			//UART0_Put(str);
 			cnt = 0;
-			dropped_below_peak = 0;
+			//dropped_below_peak = 0;
 			print_data = 0;
+			increment_counter = 0;
 		}
 	}
 }
@@ -147,17 +158,17 @@ int main(void) {
 void FTM0_IRQHandler(void){ // For FTM timer
 	// Clear the interrupt in regster FTM0_SC
 	FTM0_SC &= ~(FTM_SC_TOF_MASK);
-	
-	if (vout >= 3.25 && vout < 3.4 && increment_counter == 0) {
+/*
+	if (vout >= 3.19 && vout < 3.4 && increment_counter == 0) {
 		increment_counter = 1;
 		//UART0_Put("Found a peak\r\n");
 		dropped_below_peak = 0;
 	}
-	else if (vout < 3.25 && increment_counter == 1 && dropped_below_peak == 0) {
+	else if (vout < 3.19 && increment_counter == 1 && dropped_below_peak == 0) {
 		dropped_below_peak = 1;
 		//UART0_Put("oyoyoy");
 	}
-	else if (vout >= 3.25 && vout < 3.4 && increment_counter == 1 && dropped_below_peak == 1) {
+	else if (vout >= 3.19 && vout < 3.4 && increment_counter == 1 && dropped_below_peak == 1) {
 		print_data = 1;
 		//UART0_Put("OYOYOY");
 	}
@@ -165,8 +176,24 @@ void FTM0_IRQHandler(void){ // For FTM timer
 		//sprintf(str,"Count = %d\n\r", cnt); 
 		//UART0_Put(str);
 		cnt++;
+	} */
+	
+	
+	if (slope == 1 && last_slope == -1 && increment_counter == 0) {
+		// found peak, start counting
+		increment_counter = 1;
+		
+	}
+	else if (slope == 1 && last_slope == -1 && increment_counter == 1) {
+		// reached second peak, print data
+		print_data = 1;
 	}
 	
+	if (increment_counter) {
+		//sprintf(str,"Count = %d\n\r", cnt); 
+		//UART0_Put(str);
+		cnt++;
+	} 
 }
 
 void FTM_Init(void){
