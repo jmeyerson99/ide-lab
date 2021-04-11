@@ -17,6 +17,7 @@ void DAC0_Init(void);
 void ADC1_IRQHandler(void);
 void FTM_Init(void);
 void FTM0_IRQHandler(void);
+void PDB0_IRQHandler(void);
 
 /* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
@@ -30,6 +31,9 @@ static double last_vout = 0.0;
 static int slope = 0;
 static int last_slope = 0;
 static char str[100];
+
+static int loop_cnt = 0;
+static double BPM_averager = 0.0;
  
 void PDB_Init() {
 	// Enable clock for PDB module
@@ -138,6 +142,7 @@ int main(void) {
 
 		if (vout - last_vout > 0) {slope = 1;}
 		if (vout - last_vout < 0) {slope = -1;}
+	
 		
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
@@ -145,14 +150,27 @@ int main(void) {
 		if (print_data) {
 			sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
 			UART0_Put(str);
-			//sprintf(str,"BPM = %d\n\r", ((1000*60)/cnt)); // print the counter (counter incrememts by 1 every 1 ms)
-			//UART0_Put(str);
-			cnt = 0;
-			//dropped_below_peak = 0;
-			print_data = 0;
-			increment_counter = 0;
+			if (loop_cnt == 5) {
+				sprintf(str,"BPM = %lf\n\r", (BPM_averager/5)); // print the counter (counter incrememts by 1 every 1 ms)
+				UART0_Put(str);
+				cnt = 0;
+				//dropped_below_peak = 0;
+				print_data = 0;
+				increment_counter = 0;
+				loop_cnt = 0;
+				BPM_averager = 0;
+			}
+			BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
+			loop_cnt++;
 		}
 	}
+}
+
+
+void PDB0_IRQHandler(void){ // For PDB timer
+	// Clear the interrupt in register PDB0_SC
+	PDB0_SC &= ~(PDB_SC_PDBIF_MASK);
+
 }
 
 void FTM0_IRQHandler(void){ // For FTM timer
@@ -182,7 +200,6 @@ void FTM0_IRQHandler(void){ // For FTM timer
 	if (slope == 1 && last_slope == -1 && increment_counter == 0) {
 		// found peak, start counting
 		increment_counter = 1;
-		
 	}
 	else if (slope == 1 && last_slope == -1 && increment_counter == 1) {
 		// reached second peak, print data
