@@ -9,6 +9,7 @@ Date: 2/26/21
 #include "MK64F12.h"
 #include "led.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Function Prototypes */
 void PDB_Init(void);
@@ -17,23 +18,25 @@ void DAC0_Init(void);
 void ADC1_IRQHandler(void);
 void FTM_Init(void);
 void FTM0_IRQHandler(void);
-void PDB0_IRQHandler(void);
+void print_BPM(void);
 
 /* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
 
 static int cnt = 0;
-static int print_data = 0;
-static int increment_counter = 0; // use this to incrememnt the counter
-static int dropped_below_peak = 0; // use this to know when we are done counting
 static double vout = 0.0;
+static int peaks = 0;
+/*
+static int increment_counter = 0; // use this to incrememnt the counter
+
 static double last_vout = 0.0;
 static int slope = 0;
-static int last_slope = 0;
+static int last_slope = 0; 
+static int loop_cnt = 0;
+static double BPM_averager = 0.0;*/
 static char str[100];
 
-static int loop_cnt = 0;
-static double BPM_averager = 0.0;
+static double data[5000];
  
 void PDB_Init() {
 	// Enable clock for PDB module
@@ -102,12 +105,18 @@ void ADC1_Init() {
  
 // ADC1 Conversion Complete ISR
 void ADC1_IRQHandler() {
-	// Read the result (upper 12-bits). This also clears the Conversion complete flag.
-  unsigned short i = (unsigned short) (ADC1_RA >> 4); // Added casting to remove a warning
+	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+	
+	/*
+	last_slope = slope;
+	last_vout = vout;
+	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+	//sprintf(str,"vout = %f\n\r", vout); // print the counter (counter incrememts by 1 every 1 ms)
+	//UART0_Put(str);
 
-  //Set DAC output value (12bit)
-  DAC0_DAT0L = i & DAC_DATL_DATA0_MASK;        
-	DAC0_DAT0H = (i >> 8) & DAC_DATH_DATA1_MASK;
+	if (vout - last_vout > 0) {slope = 1;}
+	if (vout - last_vout < 0) {slope = -1;}
+	*/
 }
 
 void DAC0_Init() {
@@ -134,83 +143,57 @@ int main(void) {
 		// Resolution = 16 bits
 		// vout = ((3300 mV / (2^16) levels) * ADC)
 		// use pin ADC0_DP0
-		last_slope = slope;
-		last_vout = vout;
 		vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
-		//sprintf(str,"vout = %f\n\r", vout); // print the counter (counter incrememts by 1 every 1 ms)
-		//UART0_Put(str);
-
-		if (vout - last_vout > 0) {slope = 1;}
-		if (vout - last_vout < 0) {slope = -1;}
-	
 		
+		sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt);
+	  UART0_Put(str);
+	
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
-		
-		if (print_data) {
-			sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
-			UART0_Put(str);
-			if (loop_cnt == 5) {
-				sprintf(str,"BPM = %lf\n\r", (BPM_averager/5)); // print the counter (counter incrememts by 1 every 1 ms)
-				UART0_Put(str);
-				cnt = 0;
-				//dropped_below_peak = 0;
-				print_data = 0;
-				increment_counter = 0;
-				loop_cnt = 0;
-				BPM_averager = 0;
-			}
-			BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
-			loop_cnt++;
-		}
 	}
 }
 
-
-void PDB0_IRQHandler(void){ // For PDB timer
-	// Clear the interrupt in register PDB0_SC
-	PDB0_SC &= ~(PDB_SC_PDBIF_MASK);
-
+void print_BPM() {
+	/*
+	sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
+	UART0_Put(str);
+	if (loop_cnt == 5) {
+		sprintf(str,"BPM = %lf\n\r", (BPM_averager/5)); // print the counter (counter incrememts by 1 every 1 ms)
+		UART0_Put(str);
+		cnt = 0;
+		//print_data = 0;
+		increment_counter = 0;
+		loop_cnt = 0;
+		BPM_averager = 0;
+	}
+	BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
+	loop_cnt++; */
+	for (int i = 0; i < 5000; i++) {
+		if (data[i] > 2.8) { peaks++;}
+	}
+	sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
+	UART0_Put(str);
 }
 
 void FTM0_IRQHandler(void){ // For FTM timer
 	// Clear the interrupt in regster FTM0_SC
 	FTM0_SC &= ~(FTM_SC_TOF_MASK);
-/*
-	if (vout >= 3.19 && vout < 3.4 && increment_counter == 0) {
-		increment_counter = 1;
-		//UART0_Put("Found a peak\r\n");
-		dropped_below_peak = 0;
-	}
-	else if (vout < 3.19 && increment_counter == 1 && dropped_below_peak == 0) {
-		dropped_below_peak = 1;
-		//UART0_Put("oyoyoy");
-	}
-	else if (vout >= 3.19 && vout < 3.4 && increment_counter == 1 && dropped_below_peak == 1) {
-		print_data = 1;
-		//UART0_Put("OYOYOY");
-	}
-	if (increment_counter) {
-		//sprintf(str,"Count = %d\n\r", cnt); 
-		//UART0_Put(str);
-		cnt++;
-	} */
-	
-	
+	/*
 	if (slope == 1 && last_slope == -1 && increment_counter == 0) {
 		// found peak, start counting
 		increment_counter = 1;
 	}
 	else if (slope == 1 && last_slope == -1 && increment_counter == 1) {
 		// reached second peak, print data
-		print_data = 1;
+		print_BPM();
 	}
 	
 	if (increment_counter) {
-		//sprintf(str,"Count = %d\n\r", cnt); 
-		//UART0_Put(str);
 		cnt++;
-	} 
+	} */
+	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
+	cnt++;
+	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;memset(data, 0, sizeof data);}
 }
 
 void FTM_Init(void){

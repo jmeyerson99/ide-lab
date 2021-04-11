@@ -8,4 +8,5 @@
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
   C:\Users\Jacob\ Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h ..\code\led.h
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h ..\code\led.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h
