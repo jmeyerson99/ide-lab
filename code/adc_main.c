@@ -24,6 +24,7 @@ void print_BPM(void);
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
 
 static volatile int cnt = 0;
+static int BPM = 0;
 static volatile double vout = 0.0;
 static volatile int peaks = 0;
 
@@ -112,7 +113,17 @@ void ADC1_IRQHandler() {
 	
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
-	if (cnt == 5000) { print = 1;cnt = 0;peaks = 0;}
+	if (cnt == 5000) { 
+		int above_threshold = 0;
+		for (int i = 0; i < 5000; i++) {
+			if (data[i] > 3.0 && above_threshold == 0) { peaks++; above_threshold = 1;}
+			if (data[i] < 1.5 && above_threshold == 1) { above_threshold = 0;}
+		}
+		BPM = peaks * 60/5;
+		print = 1;
+		cnt = 0;
+		peaks = 0;
+	}
 	
 	/*
 	last_slope = slope;
@@ -156,12 +167,7 @@ int main(void) {
 	  //UART0_Put(str); // DEBUG
 		
 		if (print) {
-				int above_threshold = 0;
-				for (int i = 0; i < 5000; i++) {
-					if (data[i] > 3.0 && above_threshold == 0) { peaks++; above_threshold = 1;}
-					if (data[i] < 3.0 && above_threshold == 1) { above_threshold = 0;}
-				}
-				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks); // print the counter (counter incrememts by 1 every 1 ms)
+				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, BPM); // print the counter (counter incrememts by 1 every 1 ms)
 				UART0_Put(str);
 				print = 0;
 		}
