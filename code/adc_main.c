@@ -16,7 +16,7 @@ void ADC0_Init(void);
 void ADC0_IRQHandler(void);
 void FTM2_Init(void);
 void FTM2_IRQHandler(void);
-void print_BPM(void);
+void calc_BPM(void);
 
 /* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
@@ -29,6 +29,7 @@ static char str[100];
  
 static double BPM_data[5];
 static int data_cnt = 0;
+static double BPM = 0;
  
 // ADC0 Conversion Complete ISR
 void ADC0_IRQHandler() {
@@ -78,57 +79,18 @@ int main(void) {
 	FTM2_Init();
 
 	for(;;) {
-		// Vcc = 3.3 V 
-		// Resolution = 16 bits
-		// vout = ((3300 mV / (2^16) levels) * ADC)
-		// use pin ADC0_DP0
-		//vout = (((3300.0/65536.0) * ADC0_RA)/1000.0);
+		sprintf(str,"My Heart Rate is %g BPM\n\r", BPM); // print the counter (counter incrememts by 1 every 1 ms)
+		UART0_Put(str);
 		
-		//sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
-	  //UART0_Put(str); // DEBUG
-
-		//sprintf(str,"cnt = %d, BPM = %g\n\r", cnt, cnt*60.0/1000.0); // print the counter (counter incrememts by 1 every 1 ms)
-		//UART0_Put(str);
-		
-		//for (int j = 0; j < 5000000; j++) {}
-	
-		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
-		//UART0_Put(str);
+		for (int j = 0; j < 5000000; j++) {}
 	}
 }
 
-	/*
-	sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
-	UART0_Put(str);
-	if (loop_cnt == 5) {
-		sprintf(str,"BPM = %lf\n\r", (BPM_averager/5)); // print the counter (counter incrememts by 1 every 1 ms)
-		UART0_Put(str);
-		cnt = 0;
-		//print_data = 0;
-		increment_counter = 0;
-		loop_cnt = 0;
-		BPM_averager = 0;
-	}
-	BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
-	loop_cnt++; */
-	
-	/*
-	int above_threshold = 0;
-	for (int i = 0; i < 5000; i++) {
-		if (data[i] > 3.1 && above_threshold == 0) { peaks++; above_threshold = 1;}
-		if (data[i] < 3.1 && above_threshold == 1) { above_threshold = 0;}
-	}
-	sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
-	UART0_Put(str);
-	*/
-	
-void print_BPM() {
+void calc_BPM() {
 	BPM_data[data_cnt] = (1.0/cnt) *  (1000.0 * 60.0);
 	data_cnt++;
 	if (data_cnt == 5) {
-		double BPM = (BPM_data[0] + BPM_data[1] + BPM_data[2] + BPM_data[3] + BPM_data[4])/5.0;
-		sprintf(str,"cnt = %d, BPM = %g\n\r", cnt, BPM); // print the counter (counter incrememts by 1 every 1 ms)
-		UART0_Put(str);
+		BPM = (BPM_data[0] + BPM_data[1] + BPM_data[2] + BPM_data[3] + BPM_data[4])/5.0;
 		data_cnt = 0;
 	}
 	
@@ -137,25 +99,6 @@ void print_BPM() {
 void FTM2_IRQHandler(void){ // For FTM timer
 	// Clear the interrupt in regster FTM2_SC
 	FTM2_SC &= ~(FTM_SC_TOF_MASK);
-	/*
-	if (slope == 1 && last_slope == -1 && increment_counter == 0) {
-		// found peak, start counting
-		increment_counter = 1;
-	}
-	else if (slope == 1 && last_slope == -1 && increment_counter == 1) {
-		// reached second peak, print data
-		print_BPM();
-	}
-	
-	if (increment_counter) {
-		cnt++;
-	} */
-	
-	/*
-	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
-	cnt++;
-	if (cnt == 5000) { print=1;cnt = 0;peaks = 0;} 
-	*/
 	
 	if (vout > 2.67 && above_peak == 0 && increment_counter == 0) {
 		// found peak, start counting
@@ -164,7 +107,7 @@ void FTM2_IRQHandler(void){ // For FTM timer
 	}
 	else if (vout > 2.67 && above_peak == 0 && increment_counter == 1) {
 		// reached second peak, print data
-		print_BPM();
+		calc_BPM();
 		increment_counter = 0;
 		above_peak = 0;
 		cnt = 0;

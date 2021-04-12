@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\adc_sensor_part_2.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\adc_sensor_part_2.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Mon Apr 12 19:02:43 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Mon Apr 12 19:20:38 2021
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -413,8 +413,8 @@ Global Symbols
 <P><STRONG><a name="[106]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[98]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36 + Unknown Stack Size
-<LI>Call Chain = __rt_entry_main &rArr; main &rArr; FTM2_Init &rArr; __NVIC_EnableIRQ
+<BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
+<LI>Call Chain = __rt_entry_main &rArr; main &rArr; sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -775,7 +775,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sputc
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_char_common
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<BR>[Called By]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[109]"></a>__use_two_region_memory</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
@@ -1143,12 +1143,11 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[36]"></a>FTM2_IRQHandler</STRONG> (Thumb, 352 bytes, Stack size 8 bytes, adc_main.o(.text.FTM2_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200 + Unknown Stack Size
-<LI>Call Chain = FTM2_IRQHandler &rArr; print_BPM &rArr; sprintf &rArr; _printf_char_common &rArr; __printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = FTM2_IRQHandler &rArr; calc_BPM &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmple
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmpge
-<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_BPM
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
@@ -1163,7 +1162,7 @@ Global Symbols
 <P><STRONG><a name="[61]"></a>SystemInit</STRONG> (Thumb, 230 bytes, Stack size 0 bytes, system_mk64f12.o(.text.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(.text)
 </UL>
-<P><STRONG><a name="[c9]"></a>UART0_Init</STRONG> (Thumb, 206 bytes, Stack size 4 bytes, uart.o(.text.UART0_Init))
+<P><STRONG><a name="[cb]"></a>UART0_Init</STRONG> (Thumb, 206 bytes, Stack size 4 bytes, uart.o(.text.UART0_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = UART0_Init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1174,7 +1173,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Putchar
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<BR>[Called By]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[c8]"></a>UART0_Putchar</STRONG> (Thumb, 50 bytes, Stack size 4 bytes, uart.o(.text.UART0_Putchar))
@@ -1183,28 +1182,28 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
 </UL>
 
-<P><STRONG><a name="[99]"></a>main</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, adc_main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = main &rArr; FTM2_Init &rArr; __NVIC_EnableIRQ
-</UL>
-<BR>[Calls]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_Init
-<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_Init
-<LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
-</UL>
-<BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
-</UL>
-
-<P><STRONG><a name="[c4]"></a>print_BPM</STRONG> (Thumb, 344 bytes, Stack size 56 bytes, adc_main.o(.text.print_BPM))
-<BR><BR>[Stack]<UL><LI>Max Depth = 192 + Unknown Stack Size
-<LI>Call Chain = print_BPM &rArr; sprintf &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[c4]"></a>calc_BPM</STRONG> (Thumb, 296 bytes, Stack size 32 bytes, adc_main.o(.text.calc_BPM))
+<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = calc_BPM &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
-<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
+<LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
-<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
-<LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sprintf
-<LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 </UL>
 <BR>[Called By]<UL><LI><a href="#[36]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_IRQHandler
+</UL>
+
+<P><STRONG><a name="[99]"></a>main</STRONG> (Thumb, 104 bytes, Stack size 24 bytes, adc_main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
+<LI>Call Chain = main &rArr; sprintf &rArr; _printf_char_common &rArr; __printf
+</UL>
+<BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sprintf
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FTM2_Init
+<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_Init
+<LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Put
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+</UL>
+<BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
 <P><STRONG><a name="[b1]"></a>_btod_d2e</STRONG> (Thumb, 62 bytes, Stack size 0 bytes, btod.o(CL$$btod_d2e))
@@ -1290,10 +1289,10 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> rt_ctype_table.o(.text)
 </UL>
-<P><STRONG><a name="[cb]"></a>__aeabi_dadd</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, daddsub_clz.o(x$fpl$dadd))
+<P><STRONG><a name="[ca]"></a>__aeabi_dadd</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, daddsub_clz.o(x$fpl$dadd))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __aeabi_dadd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_BPM
 </UL>
 
 <P><STRONG><a name="[d2]"></a>_dadd</STRONG> (Thumb, 332 bytes, Stack size 16 bytes, daddsub_clz.o(x$fpl$dadd), UNUSED)
@@ -1311,7 +1310,7 @@ Global Symbols
 <P><STRONG><a name="[c0]"></a>__aeabi_ddiv</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, ddiv.o(x$fpl$ddiv))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __aeabi_ddiv
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_BPM
 <LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_IRQHandler
 </UL>
 
@@ -1330,8 +1329,8 @@ Global Symbols
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_deq
 </UL>
 
-<P><STRONG><a name="[ca]"></a>__aeabi_i2d</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, dflt_clz.o(x$fpl$dflt))
-<BR><BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<P><STRONG><a name="[c9]"></a>__aeabi_i2d</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, dflt_clz.o(x$fpl$dflt))
+<BR><BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_BPM
 </UL>
 
 <P><STRONG><a name="[112]"></a>_dflt</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, dflt_clz.o(x$fpl$dflt), UNUSED)
@@ -1367,7 +1366,7 @@ Global Symbols
 <P><STRONG><a name="[bf]"></a>__aeabi_dmul</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, dmul.o(x$fpl$dmul))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __aeabi_dmul
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;print_BPM
+<BR>[Called By]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_BPM
 <LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0_IRQHandler
 </UL>
 
