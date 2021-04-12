@@ -165,12 +165,11 @@ int main(void) {
 		
 		//sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
 	  //UART0_Put(str); // DEBUG
+
+		sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, BPM); // print the counter (counter incrememts by 1 every 1 ms)
+		UART0_Put(str);
 		
-		if (print) {
-				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, BPM); // print the counter (counter incrememts by 1 every 1 ms)
-				UART0_Put(str);
-				print = 0;
-		}
+		for (int j = 0; j < 5000000; j++) {}
 	
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
