@@ -12,118 +12,52 @@ Date: 2/26/21
 #include <string.h>
 
 /* Function Prototypes */
-void PDB_Init(void);
-void ADC1_Init(void);
-void DAC0_Init(void);
-void ADC1_IRQHandler(void);
-void FTM_Init(void);
-void FTM0_IRQHandler(void);
+void ADC0_Init(void);
+void ADC0_IRQHandler(void);
+void FTM2_Init(void);
+void FTM2_IRQHandler(void);
 void print_BPM(void);
 
 /* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
 
 static volatile int cnt = 0;
-static int BPM = 0;
 static volatile double vout = 0.0;
-static volatile int peaks = 0;
-
-static volatile int print = 0;
-/*
+static int above_peak = 0;
 static int increment_counter = 0; // use this to incrememnt the counter
-
-static double last_vout = 0.0;
-static int slope = 0;
-static int last_slope = 0; 
-static int loop_cnt = 0;
-static double BPM_averager = 0.0;*/
 static char str[100];
-
-static double data[5000];
  
-void PDB_Init() {
-	// Enable clock for PDB module
-	SIM_SCGC6 |= SIM_SCGC6_PDB_MASK; // Enable clock on PDB
-
-	// Set continuous mode, software triggering, and PDB enabled
-	PDB0_SC |= PDB_SC_CONT_MASK;    // continuous mode
-	PDB0_SC |= PDB_SC_TRGSEL(15);   // set the PDB for software triggering (1111)
-	PDB0_SC |= PDB_SC_PDBEN_MASK;   // bit 7
-
-	// Set the mod field
-	PDB0_MOD = 50000; // 50,000,000 / 50,000 = 1000
-	
-	//PDB0_CNT = 0x0000; this gets reset when the SWTRIG gets set
-
-	// Configure the Interrupt Delay register.
-	PDB0_IDLY = 10;
-
-	// Enable the interrupt mask.
-	PDB0_SC |= PDB_SC_PDBIE_MASK;   // bit 5
-
-	// Enable LDOK to have PDB0_SC register changes loaded.
-	PDB0_SC |= PDB_SC_LDOK_MASK;
-	
-	PDB0_CH1C1 = PDB_C1_EN(0x01) | PDB_C1_TOS(0x01);
-}
+static double BPM_data[5];
+static int data_cnt = 0;
  
-void ADC1_Init() {
-	unsigned int calib;
- 
-	// Turn on clock for ADC1
-	SIM_SCGC3 |= SIM_SCGC3_ADC1_MASK;
+// ADC0 Conversion Complete ISR
+void ADC0_IRQHandler() {
+	vout = (((3300.0/65536.0) * ADC0_RA)/1000.0);
 
-	// Configure CFG Registers
-	// Configure ADC to divide 50 MHz down to 6.25 MHz AD Clock (divide by 8), 16-bit single ended
-	ADC1_CFG1 |= ADC_CFG1_ADIV(3); // 11 - divide by 8
-	ADC1_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended
-
-	// Do ADC Calibration for Singled Ended ADC. Do not touch.
-	ADC1_SC3 = ADC_SC3_CAL_MASK;
-	while ( (ADC1_SC3 & ADC_SC3_CAL_MASK) != 0 );
-	calib = ADC1_CLP0;
-	calib += ADC1_CLP1;
-	calib += ADC1_CLP2;
-	calib += ADC1_CLP3;
-	calib += ADC1_CLP4;
-	calib += ADC1_CLPS;
-	calib = calib >> 1;
-	calib |= 0x8000;
-	ADC1_PG = calib;
-
-	// Configure SC registers.
-	// Select hardware trigger.
-	ADC1_SC2 |= ADC_SC2_ADTRG_MASK; // set to 1 for hardware trigger (0 for software trigger)
-
-	// Configure SC1A register.
-	// Select ADC Channel and enable interrupts. Use ADC1 channel DADP3 in single ended mode.
-	ADC1_SC1A = 0;
-	ADC1_SC1A = ADC_SC1_ADCH(3); // 00011 is for DADP3 or DAD3, chooses  DADP3 when DIFF = 0
-	ADC1_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts
-	ADC1_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0
-
-	// Enable NVIC interrupt
-	NVIC_EnableIRQ(ADC1_IRQn);
-}
- 
-// ADC1 Conversion Complete ISR
-void ADC1_IRQHandler() {
-	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
-	
-	
+	/*
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
+	
 	if (cnt == 5000) { 
 		int above_threshold = 0;
-		for (int i = 0; i < 5000; i++) {
+		//double slope = 0; // slope
+		//double last_slope = 0; // slope
+		for (int i = 1; i < 5000; i++) {
+			//slope = data[i] - data[i-1]; // slope
+			
 			if (data[i] > 3.0 && above_threshold == 0) { peaks++; above_threshold = 1;}
 			if (data[i] < 1.5 && above_threshold == 1) { above_threshold = 0;}
+			
+			//if (last_slope > 0 && slope < 0) {peaks++;} // slope
+			
+			//last_slope = slope; // slope
 		}
 		BPM = peaks * 60/5;
 		print = 1;
 		cnt = 0;
 		peaks = 0;
 	}
+	*/
 	
 	/*
 	last_slope = slope;
@@ -136,47 +70,33 @@ void ADC1_IRQHandler() {
 	if (vout - last_vout < 0) {slope = -1;}
 	*/
 }
-
-void DAC0_Init() {
-	// Enable DAC clock
-	SIM_SCGC2 |= SIM_SCGC2_DAC0_MASK;
-	
-	DAC0_C0 = DAC_C0_DACEN_MASK | DAC_C0_DACRFS_MASK;
-	DAC0_C1 = 0;
-}
  
 int main(void) {
 	// Initialize modules
 	UART0_Init();
-	DAC0_Init();
-	ADC1_Init();
-	PDB_Init();
-	FTM_Init();
-
-	// Start the PDB (ADC Conversions)
-	PDB0_SC |= PDB_SC_SWTRIG_MASK;
+	ADC0_Init();
+	FTM2_Init();
 
 	for(;;) {
 		// Vcc = 3.3 V 
 		// Resolution = 16 bits
 		// vout = ((3300 mV / (2^16) levels) * ADC)
 		// use pin ADC0_DP0
-		//vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+		//vout = (((3300.0/65536.0) * ADC0_RA)/1000.0);
 		
 		//sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
 	  //UART0_Put(str); // DEBUG
 
-		sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, BPM); // print the counter (counter incrememts by 1 every 1 ms)
-		UART0_Put(str);
+		//sprintf(str,"cnt = %d, BPM = %g\n\r", cnt, cnt*60.0/1000.0); // print the counter (counter incrememts by 1 every 1 ms)
+		//UART0_Put(str);
 		
-		for (int j = 0; j < 5000000; j++) {}
+		//for (int j = 0; j < 5000000; j++) {}
 	
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
 	}
 }
 
-void print_BPM() {
 	/*
 	sprintf(str,"Cnt = %d\n\r", cnt); // print the counter (counter incrememts by 1 every 1 ms)
 	UART0_Put(str);
@@ -201,12 +121,22 @@ void print_BPM() {
 	sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
 	UART0_Put(str);
 	*/
-	print = 1;
+	
+void print_BPM() {
+	BPM_data[data_cnt] = (1.0/cnt) *  (1000.0 * 60.0);
+	data_cnt++;
+	if (data_cnt == 5) {
+		double BPM = (BPM_data[0] + BPM_data[1] + BPM_data[2] + BPM_data[3] + BPM_data[4])/5.0;
+		sprintf(str,"cnt = %d, BPM = %g\n\r", cnt, BPM); // print the counter (counter incrememts by 1 every 1 ms)
+		UART0_Put(str);
+		data_cnt = 0;
+	}
+	
 }
 
-void FTM0_IRQHandler(void){ // For FTM timer
-	// Clear the interrupt in regster FTM0_SC
-	FTM0_SC &= ~(FTM_SC_TOF_MASK);
+void FTM2_IRQHandler(void){ // For FTM timer
+	// Clear the interrupt in regster FTM2_SC
+	FTM2_SC &= ~(FTM_SC_TOF_MASK);
 	/*
 	if (slope == 1 && last_slope == -1 && increment_counter == 0) {
 		// found peak, start counting
@@ -221,37 +151,128 @@ void FTM0_IRQHandler(void){ // For FTM timer
 		cnt++;
 	} */
 	
-	
+	/*
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
 	if (cnt == 5000) { print=1;cnt = 0;peaks = 0;} 
+	*/
+	
+	if (vout > 2.67 && above_peak == 0 && increment_counter == 0) {
+		// found peak, start counting
+		increment_counter = 1;
+		above_peak = 1;
+	}
+	else if (vout > 2.67 && above_peak == 0 && increment_counter == 1) {
+		// reached second peak, print data
+		print_BPM();
+		increment_counter = 0;
+		above_peak = 0;
+		cnt = 0;
+	}
+	else if (vout < 1.5 && above_peak == 1 && increment_counter == 1) {
+		// dropped below the first peak
+		above_peak = 0;
+	}
+	
+	if (increment_counter) {
+		cnt++;
+	} 
 }
 
-void FTM_Init(void){
-	// Enable clock for FTM module (use FTM0)
-	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
-
-	// turn off FTM Mode to write protection;
-	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
-
-	// divide the input clock down by 128,
-	FTM0_SC |= FTM_SC_PS(7); // 111 = divide by 128
-
-	// reset the counter to zero
-	FTM0_CNT &= ~(FTM_CNT_COUNT_MASK);
-
-	// Set the overflow rate
-	// (Sysclock/128)- clock after prescaler
-	// (Sysclock/128)/1000- slow down by a factor of 1000 to go from
-	// Mhz to Khz, then 1/KHz = msec
-	// Every 1msec, the FTM counter will set the overflow flag (TOF) and
-	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK/(1<<7))/1000;
-
-	// Select the System Clock
-	FTM0_SC |= FTM_SC_CLKS(1); // 1 = system clock
-
-	// Enable the interrupt mask. Timer Overflow Interrupt Enable
-	FTM0_SC |= FTM_SC_TOIE_MASK;
+/* Initialization of FTM2 for camera */
+void FTM2_Init(){
 	
-	//NVIC_EnableIRQ(FTM0_IRQn);
+	// Enable clock
+	SIM_SCGC6 |= SIM_SCGC6_FTM2_MASK;
+
+	// Disable Write Protection
+	FTM2_MODE |= FTM_MODE_WPDIS_MASK;
+	
+	// Set output to '1' on init
+	FTM2_MODE |= FTM_MODE_INIT_MASK;
+	FTM2_OUTINIT |= FTM_OUTINIT_CH0OI_MASK; // NOTE: channel 0
+	FTM2_MODE |= FTM_MODE_FTMEN_MASK; // enable all registers
+	
+	// Initialize the CNT to 0 before writing to MOD
+	FTM2_CNT &= ~(FTM_CNT_COUNT_MASK);
+	
+	// Set the Counter Initial Value to 0
+	FTM2_CNT = 0x0000;
+	FTM2_CNTIN = 0;
+
+	// Set the period (~10us)
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(1000); 
+	
+	// 50% duty
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(1000/2)); 
+	//NOTE: CNTIN = 0x0000 in EPWM mode
+	//NOTE: 50% of the MOD register (~5us)
+
+	// Set edge-aligned mode
+	// Conditions: QUADEN = 0, DECAPEN = 0, COMBINE = 0, CPWMS = 0, MSnB = 1
+	FTM2_QDCTRL &= ~FTM_QDCTRL_QUADEN_MASK; //NOTE: channel 0
+	FTM2_COMBINE &= ~FTM_COMBINE_DECAPEN0_MASK; //NOTE: channel 0
+	FTM2_COMBINE &= ~FTM_COMBINE_COMBINE0_MASK; //NOTE: channel 0
+	FTM2_SC &= ~FTM_SC_CPWMS_MASK;
+	FTM2_C0SC |= FTM_CnSC_MSB_MASK;            	//NOTE: channel 0
+	
+	// Enable High-true pulses
+	// ELSB = 1, ELSA = 0
+	FTM2_C0SC &= ~(FTM_CnSC_ELSA_MASK);
+	FTM2_C0SC |= FTM_CnSC_ELSB_MASK;
+	
+	// Enable hardware trigger from FTM2
+	FTM2_EXTTRIG |= FTM_EXTTRIG_CH0TRIG_MASK;
+	
+	// Don't enable interrupts yet (disable)
+	FTM2_SC &= ~(FTM_SC_TOIE_MASK);
+	
+	// No prescalar, system clock
+	FTM2_SC |= FTM_SC_PS(0); //  000 = divide by 1 (no prescalar)
+	FTM2_SC |= FTM_SC_CLKS(1); // 1 = system clock
+	
+	// Set up interrupt
+	FTM2_SC |= FTM_SC_TOIE_MASK;
+
+	// Enable IRQ
+	NVIC_EnableIRQ(FTM2_IRQn);
+	
+	// Re enable write protection
+	FTM2_MODE &= ~(FTM_MODE_WPDIS_MASK);
+}
+
+/* Set up ADC for capturing camera data */
+void ADC0_Init(void) {
+  unsigned int calib;
+	
+  // Turn on ADC0
+  SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
+	
+	// Single ended 16 bit conversion, no clock divider
+	ADC0_SC1A = 0;
+	ADC0_SC1A &= ~(ADC_SC1_DIFF_MASK); // set DIFF to 0 for 16 bit conversion
+	ADC0_CFG1 |= ADC_CFG1_ADIV(0); // 0 - divide by 1
+	ADC0_CFG1 |= ADC_CFG1_MODE(3); // 11 - 16 bit single ended
+	
+	ADC0_SC1A |= ADC_SC1_ADCH(0); // 00000 is for DADP0 or DAD0, chooses  DADP0 when DIFF = 0
+	ADC0_SC1A |= ADC_SC1_AIEN_MASK; // enable interrupts
+
+	// Do ADC Calibration for Singled Ended ADC. Do not touch.
+	ADC0_SC3 = ADC_SC3_CAL_MASK;
+	while ( (ADC0_SC3 & ADC_SC3_CAL_MASK) != 0 );
+	calib = ADC0_CLP0; calib += ADC0_CLP1; calib += ADC0_CLP2;
+	calib += ADC0_CLP3; calib += ADC0_CLP4; calib += ADC0_CLPS;
+	calib = calib >> 1; calib |= 0x8000;
+	ADC0_PG = calib;
+	
+	// Select hardware trigger.
+	ADC0_SC2 |= ADC_SC2_ADTRG_MASK; // set to 1 for hardware trigger (0 for software trigger)
+	
+	// Set up FTM2 trigger on ADC0
+	SIM_SOPT7 |= SIM_SOPT7_ADC0TRGSEL(10); // 1010 - FTM2 trigger select
+  SIM_SOPT7 |= SIM_SOPT7_ADC0ALTTRGEN_MASK; // alternative trigger edge enabled
+  SIM_SOPT7 &= ~(SIM_SOPT7_ADC0PRETRGSEL_MASK); // Pretrigger A
+	
+	// Enable NVIC interrupt
+	NVIC_EnableIRQ(ADC0_IRQn);
 }

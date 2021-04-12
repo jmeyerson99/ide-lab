@@ -9,9 +9,10 @@ Date: 2/26/21
 
 // variables global to the IRQ handlers which dictates if timer is enabled &  timer counter
 // global variables are static so they can remain the same across multiple functions
+/*
 static int switch_2_cnt = 0;
 static bool switch_2_pressed = FALSE;
-static PDB_State pdb_state = DISABLED;
+static PDB_State pdb_state = DISABLED;*/
 /*
 void PDB0_IRQHandler(void){ // For PDB timer
 	// Clear the interrupt in register PDB0_SC
