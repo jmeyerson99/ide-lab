@@ -26,6 +26,8 @@ void print_BPM(void);
 static int cnt = 0;
 static volatile double vout = 0.0;
 static volatile int peaks = 0;
+
+static int print = 0;
 /*
 static int increment_counter = 0; // use this to incrememnt the counter
 
@@ -149,8 +151,19 @@ int main(void) {
 		// use pin ADC0_DP0
 		//vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 		
-		sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
-	  UART0_Put(str); // DEBUG
+		//sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
+	  //UART0_Put(str); // DEBUG
+		
+		if (print) {
+				int above_threshold = 0;
+				for (int i = 0; i < 5000; i++) {
+					if (data[i] > 3.1 && above_threshold == 0) { peaks++; above_threshold = 1;}
+					if (data[i] < 3.1 && above_threshold == 1) { above_threshold = 0;}
+				}
+				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
+				UART0_Put(str);
+				print = 0;
+		}
 	
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
@@ -172,6 +185,8 @@ void print_BPM() {
 	}
 	BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
 	loop_cnt++; */
+	
+	/*
 	int above_threshold = 0;
 	for (int i = 0; i < 5000; i++) {
 		if (data[i] > 3.1 && above_threshold == 0) { peaks++; above_threshold = 1;}
@@ -179,6 +194,8 @@ void print_BPM() {
 	}
 	sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
 	UART0_Put(str);
+	*/
+	print = 1;
 }
 
 void FTM0_IRQHandler(void){ // For FTM timer

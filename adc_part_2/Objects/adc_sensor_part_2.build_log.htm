@@ -5,7 +5,7 @@
 <h2>Tool Versions:</h2>
 IDE-Version: µVision V5.33.0.0
 Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: Charlie Poliwoda, Rochester Institute of Technology, LIC=----
+License Information: Jacob Meyerson, Rochester Institute of Technology, LIC=----
  
 Tool Versions:
 Toolchain:       MDK-Lite  Version: 5.33.0.0
@@ -21,16 +21,31 @@ Target DLL:      CMSIS_AGDI.dll V1.32.12.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-C:\Users\cpoli\Desktop\Spring 2021\IDE\ide-lab\adc_part_2\adc_sensor_part_2.uvprojx
-Project File Date:  04/08/2021
+C:\Users\Jacob Meyerson\Documents\IDE\ide-lab\adc_part_2\adc_sensor_part_2.uvprojx
+Project File Date:  04/09/2021
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.15', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
+compiling isr.c...
+../code/isr.c(12): warning: unused variable 'switch_2_cnt' [-Wunused-variable]
+static int switch_2_cnt = 0;
+           ^
+../code/isr.c(13): warning: unused variable 'switch_2_pressed' [-Wunused-variable]
+static bool switch_2_pressed = FALSE;
+            ^
+../code/isr.c(14): warning: unused variable 'pdb_state' [-Wunused-variable]
+static PDB_State pdb_state = DISABLED;
+                 ^
+3 warnings generated.
+compiling led.c...
+compiling switch.c...
+compiling uart.c...
 compiling adc_main.c...
+compiling system_MK64F12.c...
 linking...
-Program Size: Code=10204 RO-data=1640 RW-data=0 ZI-data=41240  
-".\Objects\adc_sensor_part_2.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=10176 RO-data=1616 RW-data=0 ZI-data=41248  
+".\Objects\adc_sensor_part_2.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -48,17 +63,17 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_Target_1
-  C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
-  C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include
+  C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
 
    * Component: Keil::Device:Startup:1.0.0
-      Source file:   Device\Source\system_MK64F12.c
       Source file:   Device\Source\ARM\startup_MK64F12.s
-Build Time Elapsed:  00:00:00
+      Source file:   Device\Source\system_MK64F12.c
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>
