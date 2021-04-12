@@ -1,4 +1,4 @@
-./objects/adc_main.o: ..\code\adc_main.c ..\code\uart.h \
+./objects/interrupts_main.o: ..\code\interrupts_main.c \
   C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h \
@@ -8,5 +8,5 @@
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
   C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h ..\code\led.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h
+  ..\code\uart.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
+  ..\code\isr.h ..\code\led.h ..\code\switch.h
