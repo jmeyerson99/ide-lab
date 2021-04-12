@@ -107,6 +107,10 @@ void ADC1_Init() {
 void ADC1_IRQHandler() {
 	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 	
+	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
+	cnt++;
+	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;memset(data, 0, sizeof data);}
+	
 	/*
 	last_slope = slope;
 	last_vout = vout;
@@ -145,8 +149,8 @@ int main(void) {
 		// use pin ADC0_DP0
 		//vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 		
-		sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt);
-	  UART0_Put(str);
+		sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt); // DEBUG
+	  UART0_Put(str); // DEBUG
 	
 		//sprintf(str,"vout = %f, slope = %d, last_slope = %d\n\r", vout, slope, last_slope);
 		//UART0_Put(str);
@@ -193,9 +197,11 @@ void FTM0_IRQHandler(void){ // For FTM timer
 	if (increment_counter) {
 		cnt++;
 	} */
+	
+	/*
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
-	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;memset(data, 0, sizeof data);}
+	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;memset(data, 0, sizeof data);} */
 }
 
 void FTM_Init(void){
