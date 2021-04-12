@@ -168,8 +168,10 @@ void print_BPM() {
 	}
 	BPM_averager = BPM_averager + (cnt/(1000.0))*(60.0);
 	loop_cnt++; */
+	int above_threshold = 0;
 	for (int i = 0; i < 5000; i++) {
-		if (data[i] > 2.8) { peaks++;}
+		if (data[i] > 2.8 && above_threshold == 0) { peaks++; above_threshold = 1;}
+		if (data[i] < 2.8 && above_threshold == 1) { above_threshold = 0;}
 	}
 	sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
 	UART0_Put(str);
