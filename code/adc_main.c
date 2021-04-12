@@ -143,7 +143,7 @@ int main(void) {
 		// Resolution = 16 bits
 		// vout = ((3300 mV / (2^16) levels) * ADC)
 		// use pin ADC0_DP0
-		vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
+		//vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 		
 		sprintf(str,"vout = %f, cnt = %d\n\r", vout, cnt);
 	  UART0_Put(str);
