@@ -23,11 +23,11 @@ void print_BPM(void);
 /* From clock setup 0 in system_MK64f12.c */
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
 
-static int cnt = 0;
+static volatile int cnt = 0;
 static volatile double vout = 0.0;
 static volatile int peaks = 0;
 
-static int print = 0;
+static volatile int print = 0;
 /*
 static int increment_counter = 0; // use this to incrememnt the counter
 
@@ -109,9 +109,10 @@ void ADC1_Init() {
 void ADC1_IRQHandler() {
 	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
 	
+	
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
-	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;}
+	if (cnt == 5000) { print = 1;cnt = 0;peaks = 0;}
 	
 	/*
 	last_slope = slope;
@@ -157,10 +158,10 @@ int main(void) {
 		if (print) {
 				int above_threshold = 0;
 				for (int i = 0; i < 5000; i++) {
-					if (data[i] > 3.1 && above_threshold == 0) { peaks++; above_threshold = 1;}
-					if (data[i] < 3.1 && above_threshold == 1) { above_threshold = 0;}
+					if (data[i] > 3.0 && above_threshold == 0) { peaks++; above_threshold = 1;}
+					if (data[i] < 3.0 && above_threshold == 1) { above_threshold = 0;}
 				}
-				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks * 60/5); // print the counter (counter incrememts by 1 every 1 ms)
+				sprintf(str,"peaks = %d, BPM = %d\n\r", peaks, peaks); // print the counter (counter incrememts by 1 every 1 ms)
 				UART0_Put(str);
 				print = 0;
 		}
@@ -215,10 +216,10 @@ void FTM0_IRQHandler(void){ // For FTM timer
 		cnt++;
 	} */
 	
-	/*
+	
 	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
 	cnt++;
-	if (cnt == 5000) { print_BPM();cnt = 0;peaks = 0;memset(data, 0, sizeof data);} */
+	if (cnt == 5000) { print=1;cnt = 0;peaks = 0;} 
 }
 
 void FTM_Init(void){
@@ -247,5 +248,5 @@ void FTM_Init(void){
 	// Enable the interrupt mask. Timer Overflow Interrupt Enable
 	FTM0_SC |= FTM_SC_TOIE_MASK;
 	
-	NVIC_EnableIRQ(FTM0_IRQn);
+	//NVIC_EnableIRQ(FTM0_IRQn);
 }
