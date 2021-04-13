@@ -34,42 +34,6 @@ static double BPM = 0;
 // ADC0 Conversion Complete ISR
 void ADC0_IRQHandler() {
 	vout = (((3300.0/65536.0) * ADC0_RA)/1000.0);
-
-	/*
-	data[cnt] = vout; //(uint16_t) ADC1_RA; // vout;
-	cnt++;
-	
-	if (cnt == 5000) { 
-		int above_threshold = 0;
-		//double slope = 0; // slope
-		//double last_slope = 0; // slope
-		for (int i = 1; i < 5000; i++) {
-			//slope = data[i] - data[i-1]; // slope
-			
-			if (data[i] > 3.0 && above_threshold == 0) { peaks++; above_threshold = 1;}
-			if (data[i] < 1.5 && above_threshold == 1) { above_threshold = 0;}
-			
-			//if (last_slope > 0 && slope < 0) {peaks++;} // slope
-			
-			//last_slope = slope; // slope
-		}
-		BPM = peaks * 60/5;
-		print = 1;
-		cnt = 0;
-		peaks = 0;
-	}
-	*/
-	
-	/*
-	last_slope = slope;
-	last_vout = vout;
-	vout = (((3300.0/65536.0) * ADC1_RA)/1000.0);
-	//sprintf(str,"vout = %f\n\r", vout); // print the counter (counter incrememts by 1 every 1 ms)
-	//UART0_Put(str);
-
-	if (vout - last_vout > 0) {slope = 1;}
-	if (vout - last_vout < 0) {slope = -1;}
-	*/
 }
  
 int main(void) {
