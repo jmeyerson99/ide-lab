@@ -30,5 +30,6 @@ uint8_t UART3_Getchar(void);
 void UART3_Putchar(char ch);
 void UART3_Put(char *ptr_str);
 void UART3_PutNumU(int i);
+void UART3_GetString(char* str);
 
 #endif /* UART_H */

@@ -168,3 +168,13 @@ void UART3_PutNumU(int i) {
 	sprintf(str, "%u", i);
 	UART3_Put( str);
 }
+
+void UART3_GetString(char* str) {
+	while (1) { // keep getting characters, break when I get a newline
+		*str = UART3_Getchar();
+		
+		if (*str == '\r' || *str == '\n') {*str = '\0'; return;}
+		
+		str++;
+	}
+}
