@@ -204,8 +204,8 @@ int process_line_data() {
 
 	// use smoothline to make binary plot
 	for(int i = 0; i < 128; i++){
-		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
+		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		//binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
