@@ -3,11 +3,11 @@
 <title>Static Call Graph - [.\Objects\nxp_cup.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\nxp_cup.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Wed Apr 14 22:41:31 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Tue Apr 20 13:43:00 2021
 <BR><P>
-<H3>Maximum Stack Usage =         56 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =         64 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-_printf_u &rArr; _printf_int_dec &rArr; _printf_int_common
+__rt_entry_main &rArr; main &rArr; Set_Servo_Position &rArr; __aeabi_dmul
 <P>
 <H3>
 Functions with no stack information
@@ -262,7 +262,7 @@ Global Symbols
 <P><STRONG><a name="[d1]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[71]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 64 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; Set_Servo_Position &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -841,8 +841,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Car_Init
 </UL>
 
-<P><STRONG><a name="[72]"></a>main</STRONG> (Thumb, 520 bytes, Stack size 16 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = main &rArr; Set_Servo_Position &rArr; __aeabi_dmul
+<P><STRONG><a name="[72]"></a>main</STRONG> (Thumb, 616 bytes, Stack size 24 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = main &rArr; Set_Servo_Position &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;process_line_data
 <LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Spin_Right_Motor
@@ -853,8 +853,8 @@ Global Symbols
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmplt
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmpgt
-<LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
-<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
+<LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 </UL>
 <BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
@@ -867,7 +867,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[99]"></a>__aeabi_dadd</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, daddsub_clz.o(x$fpl$dadd))
+<P><STRONG><a name="[9a]"></a>__aeabi_dadd</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, daddsub_clz.o(x$fpl$dadd))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __aeabi_dadd
 </UL>
 <BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -973,7 +973,7 @@ Global Symbols
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_dadd
 </UL>
 
-<P><STRONG><a name="[9a]"></a>__aeabi_dsub</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, daddsub_clz.o(x$fpl$dsub))
+<P><STRONG><a name="[99]"></a>__aeabi_dsub</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, daddsub_clz.o(x$fpl$dsub))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __aeabi_dsub
 </UL>
 <BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
