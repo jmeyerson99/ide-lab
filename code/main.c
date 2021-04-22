@@ -40,6 +40,8 @@ static double old_error2 = 0.0;
 
 static double previous_servo_duty = SERVO_CENTER_DUTY_CYCLE;
 
+static double current_motor_speed = 0.0;
+
 #ifdef VERBOSE
 static char str[256];
 #endif
@@ -77,10 +79,12 @@ int main(void) {
     Car_Init();
 	
 		//get_calibration_values();
+		
+	current_motor_speed = MIN_MOTOR_SPEED;
 	
 	  Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
-	  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
-		Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
+	  Spin_Left_Motor(current_motor_speed,FORWARD);
+		Spin_Right_Motor(current_motor_speed,FORWARD);
 
     // TODO - loop forever until a switch gets pressed to start running
 		
@@ -105,7 +109,7 @@ int main(void) {
 #endif
 			} 
 			else if (adjusted_mdpt > (64-10) && adjusted_mdpt < (64+10)) { // go straight // TODO - calibrate range for straight
-				if (previous_mode == STRAIGHT) { car_mode = ACCELERATE; }
+				if (previous_mode == STRAIGHT || previous_mode == ACCELERATE) { car_mode = ACCELERATE; }
 				else {car_mode = STRAIGHT; }
 #ifdef VERBOSE
 				//UART3_Put(" CONTINUE \r\n"); // DEBUG
@@ -146,14 +150,16 @@ int main(void) {
 						
           case ACCELERATE:
 						Set_Servo_Position(servo_duty);
-            Spin_Left_Motor(80,FORWARD); // TODO - change 75
-		        Spin_Right_Motor(80,FORWARD); // TODO - change 75
+						current_motor_speed = current_motor_speed + 3; // TODO - calibrate this
+						if (current_motor_speed > MAX_MOTOR_SPEED) {current_motor_speed = MAX_MOTOR_SPEED;}
+            Spin_Left_Motor(current_motor_speed,FORWARD); 
+		        Spin_Right_Motor(current_motor_speed,FORWARD); 
             break;
 
           case STRAIGHT:
             Set_Servo_Position(servo_duty);
-            Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
-		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
+            Spin_Left_Motor(current_motor_speed,FORWARD);
+		        Spin_Right_Motor(current_motor_speed,FORWARD);
             break;
 
           case STOP:
@@ -161,7 +167,7 @@ int main(void) {
 		        Spin_Right_Motor(0,FORWARD);
 						break;
 
-          case TURN_LEFT:
+          case TURN_LEFT: // TODO - implement differential steering - try to come up with algorithm
             Set_Servo_Position(servo_duty); 
 					  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
 		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);

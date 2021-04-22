@@ -20,6 +20,9 @@ typedef enum {FORWARD=0, REVERSE=1} DC_Motor_Direction;
 #define MIN_RIGHT_MOTOR_SPEED    50 // 50% duty cycle for min speed (can change when calibrated)
 #define MAX_RIGHT_MOTOR_SPEED    100 // 100% duty cycle for max speed (can change when calibrated)
 
+#define MIN_MOTOR_SPEED        50
+#define MAX_MOTOR_SPEED        100
+
 // Function prototypes
 void PWM_Init(void);
 void Servo_Init(void);
