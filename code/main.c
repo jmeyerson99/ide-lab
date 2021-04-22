@@ -14,13 +14,16 @@ Date: 3/23/21
 
 //#define VERBOSE
 
+#define TRACK_MIDPOINT 65.5 // index that we center the array around
+static unsigned int HARD_TURN_OFFSET = 9; // how far the error from the center is to turn hard
+
 // Function prototypes
 void Car_Init(void);
 int process_line_data(void);
 void get_calibration_values(void);
 
 // Car drive states
-enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, TURN_LEFT, TURN_RIGHT, BRAKE}; 
+enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, HARD_LEFT, HARD_RIGHT, SLIGHT_LEFT, SLIGHT_RIGHT, BRAKE}; 
 static enum DRIVE_MODE car_mode;
 static enum DRIVE_MODE previous_mode;
 
@@ -29,18 +32,21 @@ static uint16_t smoothline[128];
 static uint16_t binline[128];
 static uint16_t line_data[128];
 
-// Calibration Data
+// Motor speed constants
+static unsigned int MIN_MOTOR_SPEED = 50;
+static unsigned int MAX_MOTOR_SPEED = 70;
+
+// Calibration Data for PID
 static double kp = 0.2; //.2 ideal for 50% duty cycle
 static double kd = 0.52; //.52 ideal for 50% duty cycle
-static double ki = 0.1; //0
+static double ki = 0.0; //0
 
 static double error = 0.0;
 static double old_error1 = 0.0;
 static double old_error2 = 0.0;
 
 static double previous_servo_duty = SERVO_CENTER_DUTY_CYCLE;
-
-static double current_motor_speed = 0.0;
+static unsigned int current_motor_speed = 0;
 
 #ifdef VERBOSE
 static char str[256];
@@ -56,31 +62,21 @@ void Car_Init() {
 		EN_init();		 // for motor enable
 	
 		//Calibrate
-	/*
+		/*
 		char input[64];
 		char str[64];
 		char *ptr; // used just to fill an arugment for strtod
 		UART3_GetString(input);
-		unsigned int left_duty = strtoul(input, &ptr, 10); //strtod(input, &ptr); // string to double in stdlib.h
-		UART3_Put("left motor duty cycle:"); sprintf(str,"%d\n\r", left_duty); UART3_Put(str); // DEBUG
-		UART3_GetString(input);
-		unsigned int right_duty = strtoul(input, &ptr, 10); //strtod(input, &ptr); // string to double in stdlib.h
-		UART3_Put("right motor duty cycle:"); sprintf(str,"%d\n\r", right_duty); UART3_Put(str); // DEBUG
-
-	while (1) {
-		Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
-	  Spin_Left_Motor(left_duty,FORWARD);
-		Spin_Right_Motor(right_duty,FORWARD);
-	}*/
+		HARD_TURN_OFFSET = strtoul(input, &ptr, 10); //strtod(input, &ptr); // string to double in stdlib.h
+		UART3_Put("hard turn offset:"); sprintf(str,"%d\n\r", HARD_TURN_OFFSET); UART3_Put(str); // DEBUG
+		*/
 }
 
 
 int main(void) {
     Car_Init();
-	
-		//get_calibration_values();
 		
-	current_motor_speed = MIN_MOTOR_SPEED;
+		current_motor_speed = MIN_MOTOR_SPEED;
 	
 	  Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
 	  Spin_Left_Motor(current_motor_speed,FORWARD);
@@ -98,44 +94,34 @@ int main(void) {
 			int adjusted_mdpt = process_line_data();
 
 #ifdef VERBOSE
-			UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
+			//UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
 #endif
       // determine turning offsets based on the midpoint of left and right side change index
       
       if (0 == adjusted_mdpt) { // if adjusted_mdpt = 0, STOP
 				car_mode = STOP;
-#ifdef VERBOSE
-				//UART3_Put(" STOP \r\n"); // DEBUG
-#endif
 			} 
-			else if (adjusted_mdpt > (64-10) && adjusted_mdpt < (64+10)) { // go straight // TODO - calibrate range for straight
+			else if (adjusted_mdpt > (TRACK_MIDPOINT-8) && adjusted_mdpt < (TRACK_MIDPOINT+8)) { // go straight // TODO - calibrate range for straight
 				if (previous_mode == STRAIGHT || previous_mode == ACCELERATE) { car_mode = ACCELERATE; }
 				else {car_mode = STRAIGHT; }
-#ifdef VERBOSE
-				//UART3_Put(" CONTINUE \r\n"); // DEBUG
-#endif
 			}
-      else if (adjusted_mdpt > 64) { // turn left
-        car_mode = TURN_LEFT;
-#ifdef VERBOSE
-				//UART3_Put(" TURN LEFT \r\n"); // DEBUG
-#endif
+      else if (adjusted_mdpt > TRACK_MIDPOINT) { // turn left
+				if (adjusted_mdpt > TRACK_MIDPOINT + HARD_TURN_OFFSET) {car_mode = HARD_LEFT; }
+				else {car_mode = SLIGHT_LEFT; }
       }
-      else if (adjusted_mdpt < 64) { // turn right
-        car_mode = TURN_RIGHT;
-#ifdef VERBOSE
-				//UART3_Put(" TURN RIGHT \r\n"); // DEBUG
-#endif
-      }
+      else if (adjusted_mdpt < TRACK_MIDPOINT) { // turn right
+				if (adjusted_mdpt < TRACK_MIDPOINT - HARD_TURN_OFFSET) {car_mode = HARD_RIGHT; }
+				else {car_mode = HARD_RIGHT; }
+      }			
 			
 			// PID TURN LOGIC HERE
-			double raw_servo_duty = SERVO_CENTER_DUTY_CYCLE + kp*(65.5 - adjusted_mdpt); // adjust the midpoint so we don't over or under turn (especially on left hand turns!!)
+			double raw_servo_duty = SERVO_CENTER_DUTY_CYCLE + kp*(TRACK_MIDPOINT - adjusted_mdpt); // adjust the midpoint so we don't over or under turn (especially on left hand turns!!)
 			error = raw_servo_duty - previous_servo_duty;
 			double servo_duty = previous_servo_duty + kp * error + ki*((old_error1 + old_error2)/2.0) + kd*(error - 2*old_error1 + old_error2);
 #ifdef VERBOSE
-			UART3_Put("previous duty:"); sprintf(str,"%lf\n\r",previous_servo_duty); UART3_Put(str); // DEBUG
-			UART3_Put("servo duty:"); sprintf(str,"%lf\n\r",servo_duty); UART3_Put(str); // DEBUG
-			UART3_Put("error:"); sprintf(str,"%lf\n\r",error); UART3_Put(str); // DEBUG
+			//UART3_Put("previous duty:"); sprintf(str,"%lf\n\r",previous_servo_duty); UART3_Put(str); // DEBUG
+			//UART3_Put("servo duty:"); sprintf(str,"%lf\n\r",servo_duty); UART3_Put(str); // DEBUG
+			//UART3_Put("error:"); sprintf(str,"%lf\n\r",error); UART3_Put(str); // DEBUG
 #endif
 			// Clip servo values
 			if (servo_duty < SERVO_LEFT_MAX) {servo_duty = SERVO_LEFT_MAX;}
@@ -166,17 +152,29 @@ int main(void) {
 						Spin_Left_Motor(0,FORWARD);
 		        Spin_Right_Motor(0,FORWARD);
 						break;
-
-          case TURN_LEFT: // TODO - implement differential steering - try to come up with algorithm
+					// TODO - determine if the turning percentages hold up for higher speeds
+          case HARD_LEFT:
             Set_Servo_Position(servo_duty); 
-					  Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
-		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
+					  Spin_Left_Motor((current_motor_speed * 0.60),FORWARD); 
+		        Spin_Right_Motor(current_motor_speed,FORWARD);
             break;
+					
+					case SLIGHT_LEFT:
+						Set_Servo_Position(servo_duty); 
+						Spin_Left_Motor((current_motor_speed * 0.80),FORWARD); 
+		        Spin_Right_Motor(current_motor_speed,FORWARD);
+						break;
+					
+					case SLIGHT_RIGHT:
+						Set_Servo_Position(servo_duty); 
+						Spin_Left_Motor(current_motor_speed, FORWARD);						
+						Spin_Right_Motor(current_motor_speed * 0.80, FORWARD);
+						break;
 
-          case TURN_RIGHT:
+          case HARD_RIGHT:
             Set_Servo_Position(servo_duty); 
-						Spin_Left_Motor(MIN_LEFT_MOTOR_SPEED,FORWARD);
-		        Spin_Right_Motor(MIN_RIGHT_MOTOR_SPEED,FORWARD);
+						Spin_Left_Motor(current_motor_speed,FORWARD);
+		        Spin_Right_Motor(current_motor_speed * 0.60,FORWARD); 
             break;
       }
 			previous_mode = car_mode;
@@ -205,15 +203,15 @@ int process_line_data() {
 	}
 	line_avg = line_avg/128;
 #ifdef VERBOSE
-		UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
+		//UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
 #endif
 
 	// use smoothline to make binary plot
 	for(int i = 0; i < 128; i++){
-		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		//binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
+		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
-		UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
+		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
 	}
 	// find the switching indices
