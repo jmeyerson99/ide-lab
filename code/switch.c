@@ -51,3 +51,17 @@ void Switch3_Init() {
 	GPIOA_PDDR |= (0 << 4); // SWITCH is an input
 }
 
+unsigned char Switch3_Pressed() {
+	// check if switch3 pressed ()
+	// if PORT A - BIT4 is ZERO, then the switch is pressed
+	// PDIR - Port Data Input Register
+	// return a ZERO if NOT Pressed
+	// return a 0xFF if Pressed
+	if ((GPIOA_PDIR & (1 << 4)) != 0) { // if PORT A BIT 4 is 0 (if switch is not pressed)
+		return 0x00;
+	}
+	
+	// then the switch is pressed
+	return 0xFF;
+}
+
