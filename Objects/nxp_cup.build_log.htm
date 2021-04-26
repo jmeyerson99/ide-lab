@@ -27,22 +27,22 @@ Project File Date:  04/14/2021
 <h2>Output:</h2>
 *** Using Compiler 'V6.15', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
-code/main.c(158): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
-                                          Spin_Left_Motor((current_motor_speed * 0.60),FORWARD); 
-                                          ~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~^~~~~~
-code/main.c(164): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
-                                                Spin_Left_Motor((current_motor_speed * 0.80),FORWARD); 
-                                                ~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~^~~~~~
-code/main.c(171): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
-                                                Spin_Right_Motor(current_motor_speed * 0.80, FORWARD);
-                                                ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~^~~~~~
-code/main.c(177): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
-                        Spin_Right_Motor(current_motor_speed * 0.60,FORWARD); //was 0.65
-                        ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~^~~~~~
+code/main.c(162): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
+                                          Spin_Left_Motor((current_motor_speed * (HARD_TURN_PERCENTAGE/100.0)),REVERSE); 
+                                          ~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+code/main.c(168): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
+                                                Spin_Left_Motor((current_motor_speed * (SLIGHT_TURN_PERCENTAGE/100.0)),FORWARD); 
+                                                ~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+code/main.c(175): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
+                                                Spin_Right_Motor(current_motor_speed * (SLIGHT_TURN_PERCENTAGE/100.0), FORWARD);
+                                                ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+code/main.c(181): warning: implicit conversion turns floating-point number into integer: 'double' to 'unsigned int' [-Wfloat-conversion]
+                        Spin_Right_Motor(current_motor_speed *(HARD_TURN_PERCENTAGE/100.0),REVERSE); 
+                        ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 4 warnings generated.
 compiling main.c...
 linking...
-Program Size: Code=6780 RO-data=1056 RW-data=32 ZI-data=2192  
+Program Size: Code=6788 RO-data=1056 RW-data=32 ZI-data=2192  
 ".\Objects\nxp_cup.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>

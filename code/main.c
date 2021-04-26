@@ -33,13 +33,16 @@ static uint16_t binline[128];
 static uint16_t line_data[128];
 
 // Motor speed constants
-static unsigned int MIN_MOTOR_SPEED = 50;
-static unsigned int MAX_MOTOR_SPEED = 70;
+static unsigned int MIN_MOTOR_SPEED = 75; // was 50 // 60
+static unsigned int MAX_MOTOR_SPEED = 100; // was 70 // 80
+
+static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // was 80 // 80
+static unsigned int HARD_TURN_PERCENTAGE = 10;   // was 60 // 60
 
 // Calibration Data for PID
-static double kp = 0.2; //.2 ideal for 50% duty cycle
-static double kd = 0.52; //.52 ideal for 50% duty cycle
-static double ki = 0.0; //0
+static double kp = 0.13; //.2 ideal for 50%/70% duty cycle (min/max)  // 0.15 ideal for 60%/80% duty cycle (min/max)
+static double kd = 0.75; //.52 ideal for 50%/70% duty cycle (min/max) // 0.65 ideal for 60%/80% duty cycle (min/max)
+static double ki = 0.0;  //0 ideal for 50%/70% duty cycle (min/max)   // 0 ideal for 60%/80% duty cycle (min/max)
 
 static double error = 0.0;
 static double old_error1 = 0.0;
@@ -67,9 +70,10 @@ void Car_Init() {
 		char str[64];
 		char *ptr; // used just to fill an arugment for strtod
 		UART3_GetString(input);
-		HARD_TURN_OFFSET = strtoul(input, &ptr, 10); //strtod(input, &ptr); // string to double in stdlib.h
-		UART3_Put("hard turn offset:"); sprintf(str,"%d\n\r", HARD_TURN_OFFSET); UART3_Put(str); // DEBUG
+		kd = strtod(input, &ptr); //strtoul(input, &ptr, 10); // // string to double in stdlib.h
+		UART3_Put("kd:"); sprintf(str,"%lf\n\r", kd); UART3_Put(str); // DEBUG
 		*/
+	
 }
 
 
@@ -155,26 +159,26 @@ int main(void) {
 					// TODO - determine if the turning percentages hold up for higher speeds
           case HARD_LEFT:
             Set_Servo_Position(servo_duty); 
-					  Spin_Left_Motor((current_motor_speed * 0.60),FORWARD); 
+					  Spin_Left_Motor((current_motor_speed * (HARD_TURN_PERCENTAGE/100.0)),REVERSE); 
 		        Spin_Right_Motor(current_motor_speed,FORWARD);
             break;
 					
 					case SLIGHT_LEFT:
 						Set_Servo_Position(servo_duty); 
-						Spin_Left_Motor((current_motor_speed * 0.80),FORWARD); 
+						Spin_Left_Motor((current_motor_speed * (SLIGHT_TURN_PERCENTAGE/100.0)),FORWARD); 
 		        Spin_Right_Motor(current_motor_speed,FORWARD);
 						break;
 					
 					case SLIGHT_RIGHT:
 						Set_Servo_Position(servo_duty); 
 						Spin_Left_Motor(current_motor_speed, FORWARD);						
-						Spin_Right_Motor(current_motor_speed * 0.80, FORWARD);
+						Spin_Right_Motor(current_motor_speed * (SLIGHT_TURN_PERCENTAGE/100.0), FORWARD);
 						break;
 
           case HARD_RIGHT:
             Set_Servo_Position(servo_duty); 
 						Spin_Left_Motor(current_motor_speed,FORWARD);
-		        Spin_Right_Motor(current_motor_speed * 0.60,FORWARD); 
+		        Spin_Right_Motor(current_motor_speed *(HARD_TURN_PERCENTAGE/100.0),REVERSE); 
             break;
       }
 			previous_mode = car_mode;
