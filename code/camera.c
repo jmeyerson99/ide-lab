@@ -53,7 +53,7 @@ void Camera_Init() {
 }
 
 void Get_Line(uint16_t* data) { 
-	//Find alternative for top block TODO
+	/* Find alternative for top block TODO 
 	while (1) {
 		NVIC_DisableIRQ(FTM2_IRQn);
 		if (TRUE == line_ready) {break;}
@@ -63,13 +63,21 @@ void Get_Line(uint16_t* data) {
 		data[i] = line[i];
 	}
 	NVIC_EnableIRQ(FTM2_IRQn);
-	line_ready = FALSE; 
-	/*
+	line_ready = FALSE; */
+	
 	while (line_ready == FALSE) {}
 	for (int i = 0; i < 128; i++) {
 		data[i] = line[i];
 	}
-	line_ready = FALSE;  */
+	line_ready = FALSE;  
+	
+	/*
+	while (1) {if (line_ready == FALSE) {break;}}
+	for (int i = 0; i < 128; i++) {
+		data[i] = line[i];
+	}
+	line_ready = FALSE; 
+	*/
 }
 
 #ifdef DEBUG_CAM
@@ -189,10 +197,10 @@ void FTM2_Init(){
 	FTM2_CNT = 0x0000;
 	
 	// Set the period (~10us)
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000)/2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000);//TODO - previously had /2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/4; // NOTE: DUTY CYCLE = MOD / 2
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000));// TODO - previously had /4; // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 
