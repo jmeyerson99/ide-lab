@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\nxp_cup.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\nxp_cup.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Mon Apr 26 15:08:54 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Tue Apr 27 15:35:56 2021
 <BR><P>
 <H3>Maximum Stack Usage =         64 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -139,8 +139,8 @@ Function Pointers
 Global Symbols
 </H3>
 <P><STRONG><a name="[63]"></a>__main</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, __main.o(!!!main))
-<BR><BR>[Calls]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
-<LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
+<BR><BR>[Calls]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(.text)
 </UL>
@@ -242,8 +242,8 @@ Global Symbols
 <P><STRONG><a name="[d2]"></a>__rt_lib_shutdown_user_alloc_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, libshutdown2.o(.ARM.Collect$$libshutdown$$0000000C))
 
 <P><STRONG><a name="[66]"></a>__rt_entry</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry.o(.ARM.Collect$$rtentry$$00000000))
-<BR><BR>[Called By]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
-<LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
+<BR><BR>[Called By]<UL><LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
+<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
 </UL>
 
 <P><STRONG><a name="[d3]"></a>__rt_entry_presh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000002))
@@ -735,7 +735,7 @@ Global Symbols
 <P><STRONG><a name="[36]"></a>FTM2_IRQHandler</STRONG> (Thumb, 186 bytes, Stack size 0 bytes, camera.o(.text.FTM2_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mk64f12.o(RESET)
 </UL>
-<P><STRONG><a name="[81]"></a>FTM2_Init</STRONG> (Thumb, 192 bytes, Stack size 8 bytes, camera.o(.text.FTM2_Init))
+<P><STRONG><a name="[81]"></a>FTM2_Init</STRONG> (Thumb, 184 bytes, Stack size 8 bytes, camera.o(.text.FTM2_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = FTM2_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_EnableIRQ
@@ -841,7 +841,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Car_Init
 </UL>
 
-<P><STRONG><a name="[72]"></a>main</STRONG> (Thumb, 792 bytes, Stack size 24 bytes, main.o(.text.main))
+<P><STRONG><a name="[72]"></a>main</STRONG> (Thumb, 728 bytes, Stack size 24 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = main &rArr; Set_Servo_Position &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;process_line_data

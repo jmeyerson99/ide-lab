@@ -38,7 +38,7 @@
 // Don't exceed 100ms or the caps will saturate
 // Must be above 1.25 ms based on camera clk 
 //	(camera clk is the mod value set in FTM2)
-#define INTEGRATION_TIME (1.0f * .0075f) //NOTE: default = 2.0f * .0075f //NOTE: this will change based on light levels??? More light, less time
+#define INTEGRATION_TIME (0.66666f * .0075f) //NOTE: default = 2.0f * .0075f //NOTE: this will change based on light levels??? More light, less time
 //#define DEBUG_CAM // define this for when the camera is being debugged (connected to matlab)
 
 void FTM2_Init(void);

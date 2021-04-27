@@ -13,6 +13,7 @@ Date: 3/23/21
 #include <stdlib.h>
 
 //#define VERBOSE
+//#define FINISH_LINE_STOP
 
 #define TRACK_MIDPOINT 65.5 // index that we center the array around
 static unsigned int HARD_TURN_OFFSET = 9; // how far the error from the center is to turn hard
@@ -21,6 +22,9 @@ static unsigned int HARD_TURN_OFFSET = 9; // how far the error from the center i
 void Car_Init(void);
 int process_line_data(void);
 void get_calibration_values(void);
+#ifdef FINISH_LINE_STOP
+void Stop_Car(void);
+#endif
 
 // Car drive states
 enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, HARD_LEFT, HARD_RIGHT, SLIGHT_LEFT, SLIGHT_RIGHT, BRAKE}; 
@@ -33,7 +37,7 @@ static uint16_t binline[128];
 static uint16_t line_data[128];
 
 // Motor speed constants
-static unsigned int MIN_MOTOR_SPEED = 75; // was 50 // 60
+static unsigned int MIN_MOTOR_SPEED = 85; // was 50 // 60
 static unsigned int MAX_MOTOR_SPEED = 100; // was 70 // 80
 
 static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // was 80 // 80
@@ -118,7 +122,7 @@ int main(void) {
 				else {car_mode = HARD_RIGHT; }
       }			
 			
-			// PID TURN LOGIC HERE
+			// PID TURN LOGIC
 			double raw_servo_duty = SERVO_CENTER_DUTY_CYCLE + kp*(TRACK_MIDPOINT - adjusted_mdpt); // adjust the midpoint so we don't over or under turn (especially on left hand turns!!)
 			error = raw_servo_duty - previous_servo_duty;
 			double servo_duty = previous_servo_duty + kp * error + ki*((old_error1 + old_error2)/2.0) + kd*(error - 2*old_error1 + old_error2);
@@ -156,7 +160,7 @@ int main(void) {
 						Spin_Left_Motor(0,FORWARD);
 		        Spin_Right_Motor(0,FORWARD);
 						break;
-					// TODO - determine if the turning percentages hold up for higher speeds
+					
           case HARD_LEFT:
             Set_Servo_Position(servo_duty); 
 					  Spin_Left_Motor((current_motor_speed * (HARD_TURN_PERCENTAGE/100.0)),REVERSE); 
@@ -213,11 +217,28 @@ int process_line_data() {
 	// use smoothline to make binary plot
 	for(int i = 0; i < 128; i++){
 		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		binline[i] = smoothline[i] > 36000 ? 1 : 0; // TODO - remove the hard coded threshold
+		binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
 	}
+#ifdef FINISH_LINE_STOP
+	// Determine if on the finish line
+	unsigned int threshold_changes = 0;
+	for (int i = 1; i < 127; i++) {
+			if (binline[i-1] == 0 && binline[i] == 1) {
+				threshold_changes++;
+			}
+			else if (binline[i] == 0 && binline[i+1] == 1) {
+				threshold_changes++;
+			}
+	}
+#ifdef VERBOSE
+		UART3_Put("threshold_changes="); UART3_PutNumU(threshold_changes); UART3_Put("\r\n"); // DEBUG
+#endif
+	// epect 6 edges on starting line
+	if (3 < threshold_changes) {Stop_Car();}
+#endif
 	// find the switching indices
 	int left_side_change_index = 0;
 	int right_side_change_index = 0;
@@ -231,18 +252,12 @@ int process_line_data() {
 	return (left_side_change_index + right_side_change_index) / 2; // return the adjusted mdpt of the data
 }
 
-void get_calibration_values() {
-	char input[64];
-	char *ptr; // used just to fill an arugment for strtod
-	UART3_Put("kp=");
-	UART3_GetString(input);
-	kp = strtod(input, &ptr); // string to double in stdlib.h
-	
-	UART3_Put("kd=");
-	UART3_GetString(input);
-	kd = strtod(input, &ptr);
-	
-	UART3_Put("ki=");
-	UART3_GetString(input);
-	ki = strtod(input, &ptr);
+#ifdef FINISH_LINE_STOP
+void Stop_Car() {
+	NVIC_DisableIRQ(FTM2_IRQn);
+	Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE); 
+	Spin_Left_Motor(0,FORWARD);
+	Spin_Right_Motor(0,FORWARD); 
+	while (1) {}
 }
+#endif
