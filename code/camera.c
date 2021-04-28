@@ -34,7 +34,7 @@ static int clkval = 0;
 // line stores the current array of camera data
 static uint16_t line[128];
 
-static boolean line_ready = FALSE;
+static bool line_ready = false;
 
 #ifdef DEBUG_CAMERA
 // These variables are for streaming the camera data over UART
@@ -53,34 +53,12 @@ void Camera_Init() {
 }
 
 void Get_Line(uint16_t* data) { 
-	//Find alternative for top block TODO 
-	
-	while (1) {
-		NVIC_DisableIRQ(FTM2_IRQn);
-		if (TRUE == line_ready) {break;}
-		NVIC_EnableIRQ(FTM2_IRQn);
-	}
-	for (int i = 0; i < 128; i++) {
+	int i;
+	while (!line_ready) {}
+	for (i = 0; i < 128; i++) {
 		data[i] = line[i];
 	}
-	NVIC_EnableIRQ(FTM2_IRQn);
-	line_ready = FALSE;
-	
-	/*
-	while (line_ready == FALSE) {}
-	for (int i = 0; i < 128; i++) {
-		data[i] = line[i];
-	}
-	line_ready = FALSE;
-   */
-	
-	/*
-	while (1) {if (line_ready == FALSE) {break;}}
-	for (int i = 0; i < 128; i++) {
-		data[i] = line[i];
-	}
-	line_ready = FALSE; 
-	*/
+	line_ready = false;
 }
 
 #ifdef DEBUG_CAM
@@ -125,6 +103,7 @@ void FTM2_IRQHandler(){ // For FTM timer
 	
 	// Toggle clk
 	GPIOB_PTOR = (1 << 9);
+	clkval = !clkval;
 	
 	// Line capture logic
 	if ((pixcnt >= 2) && (pixcnt < 256)) {
@@ -149,7 +128,7 @@ void FTM2_IRQHandler(){ // For FTM timer
 		GPIOB_PCOR |= (1 << 9); // CLK = 0
 		clkval = 0; // make sure clock variable = 0
 		pixcnt = -2; // reset counter
-		line_ready = TRUE; // indicate the camera has completed a line scan 
+		line_ready = true; // indicate the camera has completed a line scan 
 		// Disable FTM2 interrupts (until PIT0 overflows
 		//   again and triggers another line capture)
 		FTM2_SC &= ~FTM_SC_TOIE_MASK;
@@ -194,16 +173,17 @@ void FTM2_Init(){
 	FTM2_MODE |= FTM_MODE_FTMEN_MASK; // enable all registers
 	
 	// Initialize the CNT to 0 before writing to MOD
-	FTM2_CNT &= ~(FTM_CNT_COUNT_MASK);
+	//FTM2_CNT &= ~(FTM_CNT_COUNT_MASK);
 	
 	// Set the Counter Initial Value to 0
 	FTM2_CNT = 0x0000;
+	FTM2_CNTIN = 0x0000;
 	
 	// Set the period (~10us)
-	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000);//TODO - previously had /2; // NOTE: MOD = 200 b/c SYS_CLK * MOD = 10us
+	FTM2->MOD = (DEFAULT_SYSTEM_CLOCK)/(100000); // NOTE: MOD = 100 b/c SYS_CLK * MOD = 10us
 	
 	// 50% duty
-	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2;// TODO - previously had /4; // NOTE: DUTY CYCLE = MOD / 2
+	FTM2_C0V = ((DEFAULT_SYSTEM_CLOCK)/(100000))/2; // NOTE: DUTY CYCLE = MOD / 2
 	//NOTE: CNTIN = 0x0000 in EPWM mode
 	//NOTE: 50% of the MOD register (~5us)
 

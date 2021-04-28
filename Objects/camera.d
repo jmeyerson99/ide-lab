@@ -1,11 +1,15 @@
-./objects/camera.o: code\camera.c code\camera.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_version.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_compiler.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armclang.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
-  C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h \
-  code\uart.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h code\led.h
+.\objects\camera.o: code\camera.c
+.\objects\camera.o: code\camera.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h
+.\objects\camera.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_version.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_compiler.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h
+.\objects\camera.o: code\uart.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h
+.\objects\camera.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\camera.o: code\led.h
+.\objects\camera.o: C:\Users\Jacob Meyerson\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h
+.\objects\camera.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

@@ -60,6 +60,7 @@ static char str[256];
 #endif
 
 void Car_Init() {
+		__asm("CPSID I");
     UART0_Init();  // for serial
 		Camera_Init(); // for camera
     UART3_Init();  // for bluetooth
@@ -67,6 +68,7 @@ void Car_Init() {
     Servo_Init();  // for servo
     LED_Init();    // for on board LED
 		EN_init();		 // for motor enable
+	__asm("CPSIE I");
 	
 		//Calibrate
 		/*
@@ -82,6 +84,10 @@ void Car_Init() {
 
 
 int main(void) {
+		double raw_servo_duty;
+		double servo_duty;
+		int adjusted_mdpt;
+	
     Car_Init();
 		
 		current_motor_speed = MIN_MOTOR_SPEED;
@@ -99,7 +105,7 @@ int main(void) {
       Debug_Camera();
 #endif /* DEBUG_CAM */
 			
-			int adjusted_mdpt = process_line_data();
+			adjusted_mdpt = process_line_data();
 
 #ifdef VERBOSE
 			//UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
@@ -123,9 +129,9 @@ int main(void) {
       }			
 			
 			// PID TURN LOGIC
-			double raw_servo_duty = SERVO_CENTER_DUTY_CYCLE + kp*(TRACK_MIDPOINT - adjusted_mdpt); // adjust the midpoint so we don't over or under turn (especially on left hand turns!!)
+			raw_servo_duty = SERVO_CENTER_DUTY_CYCLE + kp*(TRACK_MIDPOINT - adjusted_mdpt); // adjust the midpoint so we don't over or under turn (especially on left hand turns!!)
 			error = raw_servo_duty - previous_servo_duty;
-			double servo_duty = previous_servo_duty + kp * error + ki*((old_error1 + old_error2)/2.0) + kd*(error - 2*old_error1 + old_error2);
+			servo_duty = previous_servo_duty + kp * error + ki*((old_error1 + old_error2)/2.0) + kd*(error - 2*old_error1 + old_error2);
 #ifdef VERBOSE
 			//UART3_Put("previous duty:"); sprintf(str,"%lf\n\r",previous_servo_duty); UART3_Put(str); // DEBUG
 			//UART3_Put("servo duty:"); sprintf(str,"%lf\n\r",servo_duty); UART3_Put(str); // DEBUG
@@ -190,17 +196,21 @@ int main(void) {
 }
 
 int process_line_data() {
+	int line_avg;
+	int i;
+	int left_side_change_index;
+	int right_side_change_index;
 	// Get a line from the camera
 	Get_Line(line_data);
 
 	// process the line here - create binary plot
-	int line_avg = 0;
+	line_avg = 0;
 	// smooth out the line using 5 point averager (edge cases, then loop)
 	smoothline[0] = (line_data[0] + line_data[1] + line_data[2])/3;
 	smoothline[1] = (line_data[1] + line_data[1] + line_data[2] + line_data[0])/4;
 	smoothline[127] = (line_data[127] + line_data[126] + line_data[125])/3;
 	smoothline[126] = (line_data[126] + line_data[125] + line_data[124] + line_data[127])/4;
-	for(int i = 0; i < 128; i++) {
+	for(i = 0; i < 128; i++) {
 		if(i > 1 && i < 126){
 			smoothline[i] = (line_data[i] + line_data[i+1] + line_data[i+2] + line_data[i-1] + line_data[i-2])/5;
 		}
@@ -215,16 +225,17 @@ int process_line_data() {
 #endif
 
 	// use smoothline to make binary plot
-	for(int i = 0; i < 128; i++){
-		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
+	for(i = 0; i < 128; i++){
+		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		//binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
 	}
 #ifdef FINISH_LINE_STOP
 	// Determine if on the finish line
-	unsigned int threshold_changes = 0;
+	unsigned int threshold_changes;
+	threshold_changes = 0;
 	for (int i = 1; i < 127; i++) {
 			if (binline[i-1] == 0 && binline[i] == 1) {
 				threshold_changes++;
@@ -240,12 +251,12 @@ int process_line_data() {
 	if (3 < threshold_changes) {Stop_Car();}
 #endif
 	// find the switching indices
-	int left_side_change_index = 0;
-	int right_side_change_index = 0;
-	for (int i = 1; i < 128; i++) {
+	left_side_change_index = 0;
+	right_side_change_index = 0;
+	for (i = 1; i < 128; i++) {
 		if (binline[i-1] == 0 && binline[i] == 1) {left_side_change_index = i;break;}
 	}
-	for (int i = 127; i > 1; i--) {
+	for (i = 127; i > 1; i--) {
 		if (binline[i] == 0 && binline[i-1] == 1) {right_side_change_index = i;break;}
 	}
 

@@ -28,6 +28,7 @@
 #include "uart.h"
 #include "led.h"
 #include "stdio.h"
+#include "stdbool.h"
 
 // Default System clock value
 // period = 1/20485760  = 4.8814395e-8
@@ -52,8 +53,6 @@ void ADC0_IRQHandler(void);
 void Get_Line(uint16_t* data);
 
 void Camera_Init(void);
-
-typedef enum {FALSE, TRUE} boolean;
 
 #ifdef DEBUG_CAM
 void Debug_Camera(void);
