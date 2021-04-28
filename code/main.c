@@ -18,6 +18,8 @@ Date: 3/23/21
 #define TRACK_MIDPOINT 65.5 // index that we center the array around
 static unsigned int HARD_TURN_OFFSET = 9; // how far the error from the center is to turn hard
 
+#define ACCELERATION_FACTOR 5 // how much to increase the speed when accelerating
+
 // Function prototypes
 void Car_Init(void);
 int process_line_data(void);
@@ -150,7 +152,7 @@ int main(void) {
 						
           case ACCELERATE:
 						Set_Servo_Position(servo_duty);
-						current_motor_speed = current_motor_speed + 3; // TODO - calibrate this
+						current_motor_speed = current_motor_speed + ACCELERATION_FACTOR;
 						if (current_motor_speed > MAX_MOTOR_SPEED) {current_motor_speed = MAX_MOTOR_SPEED;}
             Spin_Left_Motor(current_motor_speed,FORWARD); 
 		        Spin_Right_Motor(current_motor_speed,FORWARD); 
@@ -226,8 +228,8 @@ int process_line_data() {
 
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
-		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		//binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
+		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
