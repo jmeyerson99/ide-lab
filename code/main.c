@@ -39,11 +39,11 @@ static uint16_t binline[128];
 static uint16_t line_data[128];
 
 // Motor speed constants
-static unsigned int MIN_MOTOR_SPEED = 85; // was 50 // 60
-static unsigned int MAX_MOTOR_SPEED = 100; // was 70 // 80
+static unsigned int MIN_MOTOR_SPEED = 75;
+static unsigned int MAX_MOTOR_SPEED = 85;
 
 static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // was 80 // 80
-static unsigned int HARD_TURN_PERCENTAGE = 10;   // was 60 // 60
+static unsigned int HARD_TURN_PERCENTAGE = 25;   // was 60 // 60
 
 // Calibration Data for PID
 static double kp = 0.13; //.2 ideal for 50%/70% duty cycle (min/max)  // 0.15 ideal for 60%/80% duty cycle (min/max)
@@ -189,7 +189,7 @@ int main(void) {
 
           case HARD_RIGHT:
             Set_Servo_Position(servo_duty); 
-						Spin_Left_Motor(current_motor_speed,FORWARD);
+						Spin_Left_Motor(current_motor_speed, FORWARD);
 		        Spin_Right_Motor(current_motor_speed *(HARD_TURN_PERCENTAGE/100.0),REVERSE); 
             break;
       }
@@ -229,7 +229,7 @@ int process_line_data() {
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
 		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		binline[i] = smoothline[i] > 22000 ? 1 : 0; // TODO - remove the hard coded threshold
+		binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
