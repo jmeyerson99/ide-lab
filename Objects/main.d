@@ -14,4 +14,6 @@
 .\objects\main.o: C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 .\objects\main.o: code\pwm.h
+.\objects\main.o: code\switch.h
+.\objects\main.o: C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

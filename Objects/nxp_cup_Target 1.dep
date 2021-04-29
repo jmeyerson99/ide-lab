@@ -24,7 +24,7 @@ I (C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cms
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h)(0x5E8F87F2)
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h)(0x5404C1E0)
 F (.\code\led.h)(0x6077257C)()
-F (.\code\main.c)(0x608A0D00)(-c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\_Target_1-IC:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DMK64FN1M0xxx12 -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\code\main.c)(0x608AE593)(-c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\_Target_1-IC:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DMK64FN1M0xxx12 -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (code\camera.h)(0x6089D2FF)
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h)(0x585C32DA)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EE582)
@@ -38,6 +38,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E8EE582)
 I (code\led.h)(0x6077257C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x5E8EE582)
 I (code\pwm.h)(0x6081DA07)
+I (code\switch.h)(0x6086FCC8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8EE582)
 F (.\code\pwm.c)(0x6077257C)(-c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\_Target_1-IC:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DMK64FN1M0xxx12 -D_RTE_-o .\objects\pwm.o --omf_browse .\objects\pwm.crf --depend .\objects\pwm.d)
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h)(0x585C32DA)
@@ -49,7 +50,7 @@ I (C:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cms
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\system_MK64F12.h)(0x5404C1E0)
 I (code\pwm.h)(0x6081DA07)
 F (.\code\pwm.h)(0x6081DA07)()
-F (.\code\switch.c)(0x6086FCC8)(-c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\_Target_1-IC:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DMK64FN1M0xxx12 -D_RTE_-o .\objects\switch.o --omf_browse .\objects\switch.crf --depend .\objects\switch.d)
+F (.\code\switch.c)(0x608AD0CC)(-c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\_Target_1-IC:\Users\cpoli\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DMK64FN1M0xxx12 -D_RTE_-o .\objects\switch.o --omf_browse .\objects\switch.crf --depend .\objects\switch.d)
 I (code\switch.h)(0x6086FCC8)
 I (C:\Users\cpoli\AppData\Local\Arm\Packs\Keil\Kinetis_K60_DFP\1.5.0\Device\Include\MK64F12.h)(0x585C32DA)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EE582)

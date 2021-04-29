@@ -9,16 +9,29 @@ Date: 3/23/21
 #include "led.h"
 #include "uart.h"
 #include "pwm.h"
+#include "switch.h"
 
 #include <stdlib.h>
 
 //#define VERBOSE
 //#define FINISH_LINE_STOP
+//#define BLUETOOTH_CALIBRATE
 
 #define TRACK_MIDPOINT 65.5 // index that we center the array around
-static unsigned int HARD_TURN_OFFSET = 9; // how far the error from the center is to turn hard
+#define HARD_TURN_OFFSET 9  // how far the error from the center is to turn hard
 
 #define ACCELERATION_FACTOR 5 // how much to increase the speed when accelerating
+
+// Constant arrays for mode 
+#define NUMBER_OF_MODES 3
+static unsigned int min_motor_speeds[] = {75, 85, 90};
+static unsigned int max_motor_speeds[] = {85, 95, 100};
+static unsigned int slight_turn_percentages[] = {90, 90, 90};
+static unsigned int hard_turn_percentages[] = {25, 10, 5};
+static double kps[] = {0.13, 0.13, .10};
+static double kis[] = {0.0, 0.0, 0.0};
+static double kds[] = {0.75, 0.75, 0.79};
+static unsigned char LED_colors[] = {'g', 'y', 'm'};
 
 // Function prototypes
 void Car_Init(void);
@@ -42,8 +55,8 @@ static uint16_t line_data[128];
 static unsigned int MIN_MOTOR_SPEED = 75;
 static unsigned int MAX_MOTOR_SPEED = 85;
 
-static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // was 80 // 80
-static unsigned int HARD_TURN_PERCENTAGE = 25;   // was 60 // 60
+static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // percentage of current speed
+static unsigned int HARD_TURN_PERCENTAGE = 25;  
 
 // Calibration Data for PID
 static double kp = 0.13; //.2 ideal for 50%/70% duty cycle (min/max)  // 0.15 ideal for 60%/80% duty cycle (min/max)
@@ -63,42 +76,63 @@ static char str[256];
 
 void Car_Init() {
 		__asm("CPSID I");
-    UART0_Init();  // for serial
-		Camera_Init(); // for camera
-    UART3_Init();  // for bluetooth
-    PWM_Init();    // for motors
-    Servo_Init();  // for servo
-    LED_Init();    // for on board LED
-		EN_init();		 // for motor enable
+    UART0_Init();   // for serial
+		Camera_Init();  // for camera
+    UART3_Init();   // for bluetooth
+    PWM_Init();     // for motors
+    Servo_Init();   // for servo
+    LED_Init();     // for on board LED
+		EN_init();		  // for motor enable
+		Switch2_Init(); // for switch 2
+		Switch3_Init(); // for switch 3
 	__asm("CPSIE I");
 	
-		//Calibrate
-		/*
+		// Bluetooth Calibrate
+#ifdef BLUETOOTH_CALIBRATE
 		char input[64];
 		char str[64];
 		char *ptr; // used just to fill an arugment for strtod
 		UART3_GetString(input);
 		kd = strtod(input, &ptr); //strtoul(input, &ptr, 10); // // string to double in stdlib.h
 		UART3_Put("kd:"); sprintf(str,"%lf\n\r", kd); UART3_Put(str); // DEBUG
-		*/
-	
+#endif
 }
-
 
 int main(void) {
 		double raw_servo_duty;
 		double servo_duty;
 		int adjusted_mdpt;
+		int mode_select;
 	
     Car_Init();
 		
+		// Get the speed mode from the user based on the switches
+		mode_select = 0;
+		while (!Switch2_Pressed()) {
+			if (Switch3_Pressed()) {
+				LED_Off();
+				mode_select++;
+				LED_On(LED_colors[mode_select % NUMBER_OF_MODES]);
+				Delay(); // delay for ~2 seconds 
+			}
+		}
+		 
+		// Assign constants based on mode
+		kp = kps[mode_select % NUMBER_OF_MODES];
+		ki = kis[mode_select % NUMBER_OF_MODES];
+		kd = kds[mode_select % NUMBER_OF_MODES];
+		MIN_MOTOR_SPEED = min_motor_speeds[mode_select % NUMBER_OF_MODES];
+		MAX_MOTOR_SPEED = max_motor_speeds[mode_select % NUMBER_OF_MODES];
+		SLIGHT_TURN_PERCENTAGE = slight_turn_percentages[mode_select % NUMBER_OF_MODES];
+		HARD_TURN_PERCENTAGE = hard_turn_percentages[mode_select % NUMBER_OF_MODES];
+		
+		// START YOUR ENGINES
+		
 		current_motor_speed = MIN_MOTOR_SPEED;
-	
+
 	  Set_Servo_Position(SERVO_CENTER_DUTY_CYCLE);
 	  Spin_Left_Motor(current_motor_speed,FORWARD);
 		Spin_Right_Motor(current_motor_speed,FORWARD);
-
-    // TODO - loop forever until a switch gets pressed to start running
 		
     // Main loop below
     //  Read the camera data, process the line array. Based on that, turn the servo and spin the DC motors
@@ -202,6 +236,9 @@ int process_line_data() {
 	int i;
 	int left_side_change_index;
 	int right_side_change_index;
+#ifdef FINISH_LINE_STOP
+		unsigned int threshold_changes;
+#endif
 	// Get a line from the camera
 	Get_Line(line_data);
 
@@ -228,17 +265,16 @@ int process_line_data() {
 
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
-		//binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
-		binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
+		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		//binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
 #endif
 	}
 #ifdef FINISH_LINE_STOP
 	// Determine if on the finish line
-	unsigned int threshold_changes;
 	threshold_changes = 0;
-	for (int i = 1; i < 127; i++) {
+	for (i = 1; i < 127; i++) {
 			if (binline[i-1] == 0 && binline[i] == 1) {
 				threshold_changes++;
 			}
@@ -250,7 +286,7 @@ int process_line_data() {
 		UART3_Put("threshold_changes="); UART3_PutNumU(threshold_changes); UART3_Put("\r\n"); // DEBUG
 #endif
 	// epect 6 edges on starting line
-	if (3 < threshold_changes) {Stop_Car();}
+	if (4 < threshold_changes) {Stop_Car();}
 #endif
 	// find the switching indices
 	left_side_change_index = 0;
