@@ -255,17 +255,17 @@ int process_line_data() {
 		}
 		line_avg = line_avg + line_data[i];
 #ifdef VERBOSE
-		//UART3_Put("line["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(line_data[i]); UART3_Put("\r\n"); // DEBUG
+		UART3_Put("line["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(line_data[i]); UART3_Put("\r\n"); // DEBUG
 #endif
 	}
 	line_avg = line_avg/128;
 #ifdef VERBOSE
-		//UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
+		UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
 #endif
 
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
-		binline[i] = smoothline[i] > line_avg ? 1 : 0; // TODO - doesnt do carpet detection
+		binline[i] = smoothline[i] > (1.5 * line_avg) ? 1 : 0; // TODO - mess around with threshold? Maybe do (0.8 * MAX)
 		//binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
