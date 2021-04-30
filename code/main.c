@@ -28,7 +28,7 @@ static unsigned int min_motor_speeds[] = {75, 85, 90};
 static unsigned int max_motor_speeds[] = {85, 95, 100};
 static unsigned int slight_turn_percentages[] = {90, 90, 90};
 static unsigned int hard_turn_percentages[] = {25, 10, 5};
-static double kps[] = {0.13, 0.13, .10};
+static double kps[] = {0.13, 0.115, .10};
 static double kis[] = {0.0, 0.0, 0.0};
 static double kds[] = {0.75, 0.75, 0.79};
 static unsigned char LED_colors[] = {'g', 'y', 'm'};
@@ -236,6 +236,7 @@ int process_line_data() {
 	int i;
 	int left_side_change_index;
 	int right_side_change_index;
+	uint16_t max_value;
 #ifdef FINISH_LINE_STOP
 		unsigned int threshold_changes;
 #endif
@@ -254,6 +255,7 @@ int process_line_data() {
 			smoothline[i] = (line_data[i] + line_data[i+1] + line_data[i+2] + line_data[i-1] + line_data[i-2])/5;
 		}
 		line_avg = line_avg + line_data[i];
+		if (smoothline[i] > max_value) {max_value = smoothline[i];} // find the max value in the array
 #ifdef VERBOSE
 		UART3_Put("line["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(line_data[i]); UART3_Put("\r\n"); // DEBUG
 #endif
@@ -262,10 +264,11 @@ int process_line_data() {
 #ifdef VERBOSE
 		UART3_Put("line_avg="); UART3_PutNumU(line_avg); UART3_Put("\r\n"); // DEBUG
 #endif
-
+	
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
-		binline[i] = smoothline[i] > (1.5 * line_avg) ? 1 : 0; // TODO - mess around with threshold? Maybe do (0.8 * MAX)
+		//binline[i] = smoothline[i] > (1.5 * line_avg) ? 1 : 0; // TODO - mess around with threshold? Maybe do (0.8 * MAX)
+		binline[i] = smoothline[i] > (0.8 * max_value) ? 1 : 0; // IDEAL
 		//binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG
