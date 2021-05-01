@@ -17,12 +17,12 @@ Date: 3/23/21
 //#define FINISH_LINE_STOP
 //#define BLUETOOTH_CALIBRATE
 
+// Camera constants
 #define TRACK_MIDPOINT 65.5 // index that we center the array around
 #define HARD_TURN_OFFSET 9  // how far the error from the center is to turn hard
+#define MAX_CAMERA_VALUE_THRESHOLD_PERCENTAGE 80 // percentage of max camera value to be considered "track"
 
-#define ACCELERATION_FACTOR 5 // how much to increase the speed when accelerating
-
-// Constant arrays for mode 
+// Constant arrays for speed modes
 #define NUMBER_OF_MODES 3
 static unsigned int min_motor_speeds[] = {75, 85, 90};
 static unsigned int max_motor_speeds[] = {85, 95, 100};
@@ -35,38 +35,41 @@ static unsigned char LED_colors[] = {'g', 'y', 'm'};
 
 // Function prototypes
 void Car_Init(void);
-int process_line_data(void);
-void get_calibration_values(void);
+int Process_Line_Data(void);
 #ifdef FINISH_LINE_STOP
 void Stop_Car(void);
 #endif
 
 // Car drive states
-enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, HARD_LEFT, HARD_RIGHT, SLIGHT_LEFT, SLIGHT_RIGHT, BRAKE}; 
+enum DRIVE_MODE {ACCELERATE, STRAIGHT, STOP, HARD_LEFT, HARD_RIGHT, SLIGHT_LEFT, SLIGHT_RIGHT}; 
 static enum DRIVE_MODE car_mode;
 static enum DRIVE_MODE previous_mode;
 
-// Local data
+// Local data for the camera line
 static uint16_t smoothline[128];
 static uint16_t binline[128];
 static uint16_t line_data[128];
 
-// Motor speed constants
+// Motor speed constants (default values for slow mode)
 static unsigned int MIN_MOTOR_SPEED = 75;
 static unsigned int MAX_MOTOR_SPEED = 85;
+#define ACCELERATION_FACTOR 5 // how much to increase the speed when accelerating
 
+// Motor turning percentage constants (default values for slow mode)
 static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // percentage of current speed
-static unsigned int HARD_TURN_PERCENTAGE = 25;  
+static unsigned int HARD_TURN_PERCENTAGE = 25;   // percentage of current speed
 
-// Calibration Data for PID
-static double kp = 0.13; //.2 ideal for 50%/70% duty cycle (min/max)  // 0.15 ideal for 60%/80% duty cycle (min/max)
-static double kd = 0.75; //.52 ideal for 50%/70% duty cycle (min/max) // 0.65 ideal for 60%/80% duty cycle (min/max)
-static double ki = 0.0;  //0 ideal for 50%/70% duty cycle (min/max)   // 0 ideal for 60%/80% duty cycle (min/max)
+// Calibration Data for PID (default values for slow mode)
+static double kp = 0.13; 
+static double kd = 0.75; 
+static double ki = 0.0;
 
+// PID Error Variables
 static double error = 0.0;
 static double old_error1 = 0.0;
 static double old_error2 = 0.0;
 
+// Motor Duty Cycle/Speed Variables
 static double previous_servo_duty = SERVO_CENTER_DUTY_CYCLE;
 static unsigned int current_motor_speed = 0;
 
@@ -141,7 +144,7 @@ int main(void) {
       Debug_Camera();
 #endif /* DEBUG_CAM */
 			
-			adjusted_mdpt = process_line_data();
+			adjusted_mdpt = Process_Line_Data();
 
 #ifdef VERBOSE
 			//UART3_Put("adjusted midpoint= "); UART3_PutNumU(adjusted_mdpt); UART3_Put("\r\n"); // DEBUG
@@ -181,9 +184,7 @@ int main(void) {
 			old_error2 = old_error1;
 			previous_servo_duty = servo_duty;
 			
-      switch (car_mode) {
-					case BRAKE:
-						
+      switch (car_mode) {				
           case ACCELERATE:
 						Set_Servo_Position(servo_duty);
 						current_motor_speed = current_motor_speed + ACCELERATION_FACTOR;
@@ -231,7 +232,7 @@ int main(void) {
     }
 }
 
-int process_line_data() {
+int Process_Line_Data() {
 	int line_avg;
 	int i;
 	int left_side_change_index;
@@ -268,7 +269,7 @@ int process_line_data() {
 	// use smoothline to make binary plot
 	for(i = 0; i < 128; i++){
 		//binline[i] = smoothline[i] > (1.5 * line_avg) ? 1 : 0; // TODO - mess around with threshold? Maybe do (0.8 * MAX)
-		binline[i] = smoothline[i] > (0.8 * max_value) ? 1 : 0; // IDEAL
+		binline[i] = smoothline[i] > ((MAX_CAMERA_VALUE_THRESHOLD_PERCENTAGE/100.0) * max_value) ? 1 : 0; // IDEAL
 		//binline[i] = smoothline[i] > 19000 ? 1 : 0; // TODO - remove the hard coded threshold
 #ifdef VERBOSE
 		//UART3_Put("bin["); UART3_PutNumU(i); UART3_Put("]="); UART3_PutNumU(binline[i]); UART3_Put("\r\n"); // DEBUG

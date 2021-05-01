@@ -3606,9 +3606,9 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>.\code\main.c</Name>
-        <ColumnNumber>34</ColumnNumber>
-        <TopLine>19</TopLine>
-        <CurrentLine>31</CurrentLine>
+        <ColumnNumber>107</ColumnNumber>
+        <TopLine>7</TopLine>
+        <CurrentLine>23</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
@@ -3634,7 +3634,7 @@
       <Doc>
         <Name>.\code\camera.c</Name>
         <ColumnNumber>0</ColumnNumber>
-        <TopLine>118</TopLine>
+        <TopLine>25</TopLine>
         <CurrentLine>131</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
@@ -3642,9 +3642,9 @@
       </Doc>
       <Doc>
         <Name>.\code\camera.h</Name>
-        <ColumnNumber>13</ColumnNumber>
-        <TopLine>21</TopLine>
-        <CurrentLine>31</CurrentLine>
+        <ColumnNumber>31</ColumnNumber>
+        <TopLine>1</TopLine>
+        <CurrentLine>42</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
@@ -3652,7 +3652,7 @@
       <Doc>
         <Name>.\code\uart.c</Name>
         <ColumnNumber>68</ColumnNumber>
-        <TopLine>148</TopLine>
+        <TopLine>1</TopLine>
         <CurrentLine>173</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
@@ -3661,7 +3661,7 @@
       <Doc>
         <Name>.\code\uart.h</Name>
         <ColumnNumber>25</ColumnNumber>
-        <TopLine>3</TopLine>
+        <TopLine>1</TopLine>
         <CurrentLine>33</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
