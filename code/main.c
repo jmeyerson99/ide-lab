@@ -128,7 +128,6 @@ int main(void) {
 		MAX_MOTOR_SPEED = max_motor_speeds[mode_select % NUMBER_OF_MODES];
 		SLIGHT_TURN_PERCENTAGE = slight_turn_percentages[mode_select % NUMBER_OF_MODES];
 		HARD_TURN_PERCENTAGE = hard_turn_percentages[mode_select % NUMBER_OF_MODES];
-		RIGHT_TURN_OFFSET = right_turn_offsets[mode_select % NUMBER_OF_MODES];
 		
 		// START YOUR ENGINES
 		
