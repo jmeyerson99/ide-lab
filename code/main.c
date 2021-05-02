@@ -28,7 +28,6 @@ static unsigned int min_motor_speeds[] = {75, 85, 90};
 static unsigned int max_motor_speeds[] = {85, 95, 100};
 static unsigned int slight_turn_percentages[] = {90, 90, 90};
 static unsigned int hard_turn_percentages[] = {25, 10, 5};
-static unsigned int right_turn_offsets[] = {0, 0, 0}; // 50 breaks turns, 10 doesn't do anything, 25 is sketchy,
 static double kps[] = {0.13, 0.115, .10};
 static double kis[] = {0.0, 0.0, 0.0};
 static double kds[] = {0.75, 0.75, 0.79};
@@ -59,7 +58,6 @@ static unsigned int MAX_MOTOR_SPEED = 85;
 // Motor turning percentage constants (default values for slow mode)
 static unsigned int SLIGHT_TURN_PERCENTAGE = 90; // percentage of current speed
 static unsigned int HARD_TURN_PERCENTAGE = 25;   // percentage of current speed
-static unsigned int RIGHT_TURN_OFFSET = 20; 
 
 // Calibration Data for PID (default values for slow mode)
 static double kp = 0.13; 
@@ -229,7 +227,7 @@ int main(void) {
           case HARD_RIGHT:
             Set_Servo_Position(servo_duty); 
 						Spin_Left_Motor(current_motor_speed, FORWARD);
-		        Spin_Right_Motor(current_motor_speed *((HARD_TURN_PERCENTAGE + RIGHT_TURN_OFFSET)/100.0),REVERSE); 
+		        Spin_Right_Motor(current_motor_speed *((HARD_TURN_PERCENTAGE)/100.0),REVERSE); 
             break;
       }
 			previous_mode = car_mode;
