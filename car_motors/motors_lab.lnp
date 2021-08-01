@@ -1,9 +1,0 @@
---cpu=Cortex-M4.fp.sp
-".\pwm.o"
-".\uart.o"
-".\car_main.o"
-".\startup_mk64f12.o"
-".\system_mk64f12.o"
---ro-base 0x00000000 --entry 0x00000000 --rw-base 0x20000000 --entry Reset_Handler --first __Vectors --strict --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
---info sizes --info totals --info unused --info veneers
---list ".\motors_lab.map" -o .\motors_lab.axf
