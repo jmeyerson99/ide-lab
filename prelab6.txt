@@ -1,0 +1,12 @@
+Pre Lab 6:
+
+1. a) 0.1533 kg-cm, 2.1293 oz-in
+   b) 1.4 A
+   c) 6 krpm
+   d) 4.5 kg-cm, 62.49 oz-in
+   e) 0.20 krpm
+
+2. a) The diodes prevent the kickback current from burning out the transistors.
+   b) The capacitor provides a smoother input current from the power supply when using PWM. - ehhhhhh
+   c) The transistors are in pairs because they must provide a voltage difference across the motor to get it to spin, so they have to provide a path to power AND a path to ground. (motor can spin in both directions)
+   d) The 2N3904/ 2N3906 transistors are small signal transistors. They can only dissipate a max of 625 mW, which is not enough to handle the power signal to the motor. Their purpose is to act as the logic to turn on the higher power rated transistors that handle passing current to the motor. The TIP31/ TIP42 transistors can dissipate a maximum power of 40 W, which is sufficient to pass a high amperage to the motor when the motor is powered. If the 2N3906/2N3906 transistors were used in place of the TIP31/TIP42 transistors, they would either burn out instantly when the normal motor power supply was connected, or the motor would barely spin because the maximum amount of current that could be passed to the motor is close to 200 mA, which is nowhere near the amount of current required to drive the motor (1.4 A). 
