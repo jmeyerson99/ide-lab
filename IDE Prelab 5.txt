@@ -1,0 +1,48 @@
+Prelab 5:
+
+Enable clock for PDB0 module
+	SIM_SCGC6 |= SIM_SCGC6_PDB_MASK;
+
+Enable clock for PDB0 IRQ, use NVIC_EnableIRQ macro
+	// Vector 68, IRQ 52, NVIC non-IPR register # 1, NVIC IPR register number 13
+	NVIC_EnableIRQ(PDB0_IRQn);
+
+Enable clock for the FTM0 module
+	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
+
+Enable the FTM0 IRQ, use NVIC_EnableIRQ macro
+	NVIC_EnableIRQ(FTM0_IRQn);
+
+Configure SW3 to be interrupted on the rising edge
+	// Use PORTx_PCRn, bits 19-16
+	PORTA_PCR4 |= PORT_PCR_IRQC(9); // 1001 = rising edge
+
+Configure SW2 to be interrupted on both rising and falling edge
+	// Use PORTx_PCRn, bits 19-16
+	PORTC_PCR6 |= PORT_PCR_IRQC(11); // 1011 = either edge
+
+Enable the clock for ADC1 module
+	SIM_SCGC3 |= SIM_SCGC3_ADC1_MASK;
+
+Enable the ADC1 IRQ, use NVIC_EnableIRQ macro
+	NVIC_EnableIRQ(ADC1_IRQn);
+
+Read result from ADC1
+	unsigned short i = ADC1_RA >> 4;
+
+Set DAC output value (12 bits) to variable i above (use DAC0, result is spread across 2 8 bit registers)
+	DAC0_DAT0L = i & DAC_DATL_DATA0_MASK;        // DAC0_DATnL
+	DAC0_DAT0H = (i >> 8) & DAC_DATH_DATA1_MASK; // DAC0_DATnH
+
+
+lab report notes:
+	know the goal of the lab - discover static (DC part) and dynamic (AC part) characteristics of OPB745
+	what exactly does that transducer do? (light to current)
+	be sure to explain your expectations before saying "the results matched the expectations"
+	don't say it was a success without explaining why it was successful
+	put diagrams for test setup
+	farther vs further (farther you measure with a ruler)
+
+	references section - cite document name
+	Q2 - no current flows at 0, so it acts as an open circuit connected high to Vs
+	put graphs from datasheet in report
