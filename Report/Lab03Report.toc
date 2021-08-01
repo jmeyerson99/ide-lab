@@ -1,4 +1,0 @@
-\contentsline {section}{Abstract}{3}
-\contentsline {section}{Design Methodology}{3}
-\contentsline {section}{Results \& Analysis}{3}
-\contentsline {section}{Conclusion}{3}
